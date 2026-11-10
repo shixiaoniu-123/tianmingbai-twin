@@ -3116,7 +3116,11 @@ function typeChatAnswer(text) {
   return bubble;
 }
 
-const AI_API_BASE = String(window.TIANMINGBAI_API_BASE || 'https://440483c4f24b93.lhr.life').replace(/\/+$/, '');
+const AI_API_BASE = String(
+  window.TIANMINGBAI_API_BASE
+  || (() => { try { return localStorage.getItem('tianmingbai:api') || ''; } catch (_) { return ''; } })()
+  || 'https://c4d43e146526b4.lhr.life'
+).replace(/\/+$/, '');
 const AI_HISTORY_KEY = 'tianmingbai:ai-history';
 let aiHistory = [];
 try {
@@ -3515,3 +3519,302 @@ function disposeScene() {
 window.addEventListener('pagehide', (event) => {
   if (!event.persisted) disposeScene();
 }, { once: true });
+
+/* 问田明白 · 底部常驻问答条
+   把原来的折叠面板换成一条始终可见的输入条，回答以卡片形式浮在它上方。 */
+(function mountAskDock() {
+  if (document.getElementById('askDockRoot')) return;
+
+  const style = document.createElement('style');
+  style.textContent = `
+#aiChatPanel{display:none!important}
+#askDockRoot{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;width:min(880px,calc(100% - 32px));z-index:9998;font-family:inherit}
+#askDockRoot .dock-body{background:linear-gradient(180deg,rgba(22,36,27,.97),rgba(13,22,17,.985));border:1px solid rgba(198,166,98,.34);border-radius:18px;box-shadow:0 22px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(16px);overflow:hidden}
+#askDockRoot .dock-head{display:flex;align-items:center;gap:11px;padding:13px 16px 11px}
+#askDockRoot .dock-badge{width:30px;height:30px;border-radius:9px;background:linear-gradient(150deg,#3f6b4a,#24402c);color:#e9dfbf;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;letter-spacing:1px;box-shadow:inset 0 0 0 1px rgba(233,223,191,.28)}
+#askDockRoot .dock-title{color:#f3efe1;font-size:15px;font-weight:700;letter-spacing:.4px}
+#askDockRoot .dock-sub{color:rgba(243,239,225,.5);font-size:11.5px;margin-top:2px}
+#askDockRoot .dock-live{margin-left:auto;display:flex;align-items:center;gap:6px;color:rgba(243,239,225,.62);font-size:11.5px}
+#askDockRoot .dock-dot{width:7px;height:7px;border-radius:50%;background:#6fbf73;box-shadow:0 0 8px rgba(111,191,115,.8)}
+#askDockRoot .dock-fold{background:none;border:0;color:rgba(243,239,225,.45);font-size:11.5px;cursor:pointer;padding:2px 4px}
+#askDockRoot .dock-fold:hover{color:#e9dfbf}
+#askDockRoot .dock-transcript{max-height:44vh;overflow-y:auto;padding:0 16px;display:flex;flex-direction:column;gap:10px}
+#askDockRoot .dock-transcript:empty{display:none}
+#askDockRoot .ask-q{color:rgba(243,239,225,.55);font-size:12.5px;padding:2px 0 0 2px}
+#askDockRoot .ask-q::before{content:'你问：';color:rgba(198,166,98,.85)}
+#askDockRoot .ask-card{background:rgba(255,255,255,.045);border-radius:13px;padding:13px 15px;border-left:3px solid #c9a227}
+#askDockRoot .ask-card.p-high{border-left-color:#d98324}
+#askDockRoot .ask-card.p-mid{border-left-color:#c9a227}
+#askDockRoot .ask-card.p-low{border-left-color:#6f8f6a}
+#askDockRoot .ask-card.refuse{border-left-color:#b45a4a;background:rgba(180,90,74,.09)}
+#askDockRoot .ask-line1{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+#askDockRoot .ask-verdict{color:#f7f3e6;font-size:16.5px;font-weight:700;letter-spacing:.3px}
+#askDockRoot .ask-pill{font-size:11px;padding:2px 8px;border-radius:999px;background:rgba(217,131,36,.16);color:#e2a86a;border:1px solid rgba(217,131,36,.34)}
+#askDockRoot .ask-card.p-mid .ask-pill{background:rgba(201,162,39,.15);color:#dcc06a;border-color:rgba(201,162,39,.34)}
+#askDockRoot .ask-card.p-low .ask-pill{background:rgba(111,143,106,.15);color:#93b48d;border-color:rgba(111,143,106,.34)}
+#askDockRoot .ask-card.refuse .ask-pill{background:rgba(180,90,74,.16);color:#e09a8b;border-color:rgba(180,90,74,.34)}
+#askDockRoot .ask-label{color:rgba(198,166,98,.9);font-size:12px;margin-top:9px}
+#askDockRoot .ask-reason{color:rgba(243,239,225,.86);font-size:13px;line-height:1.72;margin-top:3px}
+#askDockRoot .ask-actions{margin:5px 0 0;padding-left:19px;color:rgba(243,239,225,.9);font-size:13px;line-height:1.85}
+#askDockRoot .ask-meta{color:rgba(243,239,225,.42);font-size:11.5px;margin-top:9px;letter-spacing:.2px}
+#askDockRoot .dock-input-row{display:flex;gap:10px;padding:11px 16px 4px;align-items:center}
+#askDockRoot .dock-input{flex:1;height:46px;border-radius:12px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.055);color:#f3efe1;font-size:14px;padding:0 15px;outline:none;transition:border-color .18s,background .18s}
+#askDockRoot .dock-input::placeholder{color:rgba(243,239,225,.38)}
+#askDockRoot .dock-input:focus{border-color:rgba(198,166,98,.6);background:rgba(255,255,255,.08)}
+#askDockRoot .dock-send{height:46px;padding:0 22px;border-radius:12px;border:0;cursor:pointer;color:#f4f8f2;font-size:14px;font-weight:600;letter-spacing:.5px;background:linear-gradient(160deg,#43724e,#2b4a35);box-shadow:0 6px 18px rgba(43,74,53,.45);transition:filter .18s,transform .1s}
+#askDockRoot .dock-send:hover{filter:brightness(1.12)}
+#askDockRoot .dock-send:active{transform:translateY(1px)}
+#askDockRoot .dock-send[disabled]{opacity:.55;cursor:default}
+#askDockRoot .dock-chips{display:flex;gap:8px;flex-wrap:wrap;padding:2px 16px 13px}
+#askDockRoot .dock-chip{font-size:12px;color:rgba(243,239,225,.66);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:5px 12px;cursor:pointer;transition:color .16s,border-color .16s}
+#askDockRoot .dock-chip:hover{color:#e9dfbf;border-color:rgba(198,166,98,.45)}
+#askDockRoot .dock-mini{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:9998;display:none;align-items:center;gap:9px;padding:11px 18px;border-radius:999px;background:linear-gradient(160deg,#43724e,#2b4a35);color:#f4f8f2;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 12px 30px rgba(0,0,0,.45);border:1px solid rgba(233,223,191,.3)}
+@media (max-width:640px){
+  #askDockRoot{bottom:10px;width:calc(100% - 20px)}
+  #askDockRoot .dock-chips{gap:6px}
+  #askDockRoot .dock-send{padding:0 16px}
+}
+`;
+  document.head.appendChild(style);
+
+  const root = document.createElement('div');
+  root.id = 'askDockRoot';
+  root.innerHTML = `
+<div class="dock-body">
+  <div class="dock-head">
+    <div class="dock-badge">田</div>
+    <div>
+      <div class="dock-title">问田明白</div>
+      <div class="dock-sub">带着这块地的作物、生育期和天气来回答</div>
+    </div>
+    <div class="dock-live"><span class="dock-dot"></span>在线</div>
+    <button class="dock-fold" type="button">收起</button>
+  </div>
+  <div class="dock-transcript" id="askTranscript"></div>
+  <div class="dock-input-row">
+    <input class="dock-input" id="askInput" type="text" maxlength="200" placeholder="比如：现在东边洼地要不要先排水？">
+    <button class="dock-send" id="askSend" type="button">问一句</button>
+  </div>
+  <div class="dock-chips">
+    <span class="dock-chip">今天该先干啥</span>
+    <span class="dock-chip">东边洼地要不要排水</span>
+    <span class="dock-chip">这场雨对麦子影响大吗</span>
+    <span class="dock-chip">纹枯病打什么药</span>
+  </div>
+</div>`;
+  document.body.appendChild(root);
+
+  const mini = document.createElement('div');
+  mini.className = 'dock-mini';
+  mini.innerHTML = '<span>田</span><span>问田明白</span>';
+  document.body.appendChild(mini);
+
+  const transcript = root.querySelector('#askTranscript');
+  const input = root.querySelector('#askInput');
+  const sendBtn = root.querySelector('#askSend');
+  const foldBtn = root.querySelector('.dock-fold');
+  const body = root.querySelector('.dock-body');
+
+  function weatherText() {
+    let w = '';
+    try { w = typeof state !== 'undefined' && state ? String(state.weather || '') : ''; } catch (_) {}
+    const map = { rain: '雨天', sunny: '晴天', cloud: '多云', cloudy: '多云', overcast: '阴', snow: '雪', wind: '大风', drizzle: '小雨' };
+    if (map[w]) return map[w];
+    const pressed = document.querySelector('.weather-button[aria-pressed="true"]');
+    if (pressed) return (pressed.textContent || '').trim() || '未标注';
+    return w || '未标注';
+  }
+
+  function fieldContext() {
+    const parts = [];
+    try {
+      if (typeof state !== 'undefined' && state) {
+        const profile = typeof cropProfiles !== 'undefined' && cropProfiles[state.crop] ? cropProfiles[state.crop] : null;
+        if (profile) {
+          const idx = typeof stages !== 'undefined' ? stages.findIndex((s) => s.id === state.stage) : -1;
+          const stageName = idx >= 0 ? profile.stageLabels[Math.min(idx, profile.stageLabels.length - 1)] : '';
+          parts.push(`作物：${profile.name}${stageName ? `；生育期：${stageName}` : ''}`);
+        }
+        if (state.date) {
+          try {
+            const d = new Date(state.date);
+            if (!Number.isNaN(d.getTime())) parts.push(`当前日期：${d.toLocaleDateString('zh-CN')}`);
+          } catch (_) {}
+        }
+      }
+    } catch (_) {}
+    parts.push(`天气场景：${weatherText()}`);
+    parts.push('地块：3.2 亩，分六块管理分区；东片为低洼地，历史上雨后易积水；北片长势偏旺');
+    parts.push('当地：河南商丘，小农户，承包地，无企业统一管理');
+    return parts.join('\n');
+  }
+
+  let history = [];
+  try { history = JSON.parse(localStorage.getItem('tianmingbai:dock-history') || '[]'); } catch (_) { history = []; }
+
+  function addQuestion(q) {
+    const el = document.createElement('div');
+    el.className = 'ask-q';
+    el.style.cssText = 'color:rgba(243,239,225,.55);font-size:12.5px;padding:2px 0 0 2px';
+    el.textContent = q;
+    transcript.appendChild(el);
+  }
+
+  function addCard(payload) {
+    const card = document.createElement('div');
+    const level = payload.priority === '高' ? 'p-high' : payload.priority === '低' ? 'p-low' : 'p-mid';
+    card.className = `ask-card ${level}${payload.refuse ? ' refuse' : ''}`;
+    card.style.cssText = 'background:rgba(255,255,255,.045);border-radius:13px;padding:13px 15px';
+
+    const line1 = document.createElement('div');
+    line1.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px';
+    const verdict = document.createElement('span');
+    verdict.style.cssText = 'color:#f7f3e6;font-size:16.5px;font-weight:700;letter-spacing:.3px';
+    verdict.textContent = payload.verdict || '先到地里核对一遍';
+    const pill = document.createElement('span');
+    pill.style.cssText = 'font-size:11px;padding:2px 8px;border-radius:999px;background:rgba(217,131,36,.16);color:#e2a86a;border:1px solid rgba(217,131,36,.34)';
+    pill.textContent = `优先级${payload.priority || '中'}`;
+    line1.appendChild(verdict);
+    line1.appendChild(pill);
+    card.appendChild(line1);
+
+    if (payload.reason) {
+      const reason = document.createElement('div');
+      reason.style.cssText = 'color:rgba(243,239,225,.86);font-size:13px;line-height:1.72;margin-top:3px';
+      const tag = document.createElement('span');
+      tag.textContent = '依据：';
+      tag.style.color = 'rgba(198,166,98,.9)';
+      reason.appendChild(tag);
+      reason.appendChild(document.createTextNode(payload.reason));
+      card.appendChild(reason);
+    }
+
+    const actions = Array.isArray(payload.actions) ? payload.actions.filter(Boolean) : [];
+    if (actions.length) {
+      const label = document.createElement('div');
+      label.style.cssText = 'color:rgba(198,166,98,.9);font-size:12px;margin-top:9px';
+      label.textContent = payload.refuse ? '去核实：' : '今天先做：';
+      card.appendChild(label);
+      const list = document.createElement('ol');
+      list.style.cssText = 'margin:5px 0 0;padding-left:19px;color:rgba(243,239,225,.9);font-size:13px;line-height:1.85';
+      actions.forEach((a) => {
+        const li = document.createElement('li');
+        li.textContent = a;
+        list.appendChild(li);
+      });
+      card.appendChild(list);
+    }
+
+    if (payload.window) {
+      const win = document.createElement('div');
+      win.style.cssText = 'color:rgba(243,239,225,.82);font-size:12.5px;margin-top:7px';
+      const tag = document.createElement('span');
+      tag.textContent = '时间窗：';
+      tag.style.color = 'rgba(198,166,98,.9)';
+      win.appendChild(tag);
+      win.appendChild(document.createTextNode(payload.window));
+      card.appendChild(win);
+    }
+
+    if (payload.refuse && payload.refuse_reason) {
+      const why = document.createElement('div');
+      why.style.cssText = 'color:rgba(243,239,225,.82);font-size:12.5px;line-height:1.7;margin-top:7px';
+      const tag = document.createElement('span');
+      tag.textContent = '为什么不能替你定：';
+      tag.style.color = 'rgba(224,154,139,.95)';
+      why.appendChild(tag);
+      why.appendChild(document.createTextNode(payload.refuse_reason));
+      card.appendChild(why);
+    }
+
+    const meta = document.createElement('div');
+    meta.style.cssText = 'color:rgba(243,239,225,.42);font-size:11.5px;margin-top:9px;letter-spacing:.2px';
+    meta.textContent = `置信度${payload.confidence || '中'}　·　依据当前地块实时生成${payload.cached ? '（同问缓存）' : ''}`;
+    card.appendChild(meta);
+
+    transcript.appendChild(card);
+    transcript.scrollTop = transcript.scrollHeight;
+    return card;
+  }
+
+  function addError(text) {
+    const card = document.createElement('div');
+    card.className = 'ask-card refuse';
+    card.style.cssText = 'background:rgba(180,90,74,.09);border-radius:13px;padding:13px 15px';
+    const t = document.createElement('div');
+    t.style.cssText = 'color:#f7f3e6;font-size:15px;font-weight:700';
+    t.textContent = '这会儿没连上服务';
+    const d = document.createElement('div');
+    d.style.cssText = 'color:rgba(243,239,225,.8);font-size:12.5px;line-height:1.7;margin-top:6px';
+    d.textContent = text;
+    card.appendChild(t);
+    card.appendChild(d);
+    transcript.appendChild(card);
+    transcript.scrollTop = transcript.scrollHeight;
+  }
+
+  async function ask(raw) {
+    const q = String(raw || '').trim();
+    if (!q || sendBtn.disabled) return;
+    addQuestion(q);
+    input.value = '';
+    sendBtn.disabled = true;
+    sendBtn.textContent = '问着…';
+
+    try {
+      if (typeof AI_API_BASE !== 'string' || !AI_API_BASE) throw new Error('页面没有配置 AI 服务地址');
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 45000);
+      const response = await fetch(`${AI_API_BASE}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: q, field_context: fieldContext(), history: history.slice(-4) }),
+        signal: controller.signal
+      });
+      clearTimeout(timer);
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || !payload) {
+        const msg = payload && payload.message ? payload.message : `服务返回 ${response.status}`;
+        addError(msg);
+        return;
+      }
+      addCard(payload);
+      history.push({ role: 'user', content: q });
+      history.push({ role: 'assistant', content: payload.verdict || '' });
+      history = history.slice(-6);
+      try { localStorage.setItem('tianmingbai:dock-history', JSON.stringify(history)); } catch (_) {}
+    } catch (err) {
+      const reason = err && err.name === 'AbortError' ? '等太久了，模型没有返回' : (err && err.message ? err.message : '网络异常');
+      addError(`${reason}。稍等几秒再问一次。`);
+    } finally {
+      sendBtn.disabled = false;
+      sendBtn.textContent = '问一句';
+    }
+  }
+
+  sendBtn.addEventListener('click', () => ask(input.value));
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !event.isComposing) {
+      event.preventDefault();
+      ask(input.value);
+    }
+  });
+  root.querySelectorAll('.dock-chip').forEach((chip) => {
+    chip.addEventListener('click', () => ask(chip.textContent));
+  });
+
+  let folded = false;
+  foldBtn.addEventListener('click', () => {
+    folded = true;
+    body.style.display = 'none';
+    mini.style.display = 'flex';
+  });
+  mini.addEventListener('click', () => {
+    folded = false;
+    body.style.display = '';
+    mini.style.display = 'none';
+    input.focus();
+  });
+
+  if (typeof window !== 'undefined') window.__askDockReady = true;
+})();
