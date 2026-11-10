@@ -3119,7 +3119,7 @@ function typeChatAnswer(text) {
 const AI_API_BASE = String(
   window.TIANMINGBAI_API_BASE
   || (() => { try { return localStorage.getItem('tianmingbai:api') || ''; } catch (_) { return ''; } })()
-  || 'https://c4d43e146526b4.lhr.life'
+  || 'https://8874db0f1bfdef.lhr.life'
 ).replace(/\/+$/, '');
 const AI_HISTORY_KEY = 'tianmingbai:ai-history';
 let aiHistory = [];
@@ -3798,7 +3798,8 @@ window.addEventListener('pagehide', (event) => {
       event.preventDefault();
       ask(input.value);
     }
-  });
+});
+  
   root.querySelectorAll('.dock-chip').forEach((chip) => {
     chip.addEventListener('click', () => ask(chip.textContent));
   });
