@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#183d2d">
+  <title>田明白 · 我的农田数字孪生</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231c4d36'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-size='38' font-family='serif' fill='%23fbf8ef'%3E田%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./v2.css?v=22">
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="田明白首页">
+        <span class="brand-mark">田</span>
+        <span class="brand-copy">
+          <strong>田明白</strong>
+          <small>小农户 AI 农事助手</small>
+        </span>
+      </a>
+
+      <div class="context-controls" aria-label="我的田况设置">
+        <span class="context-title">
+          <b>我的田况</b>
+          <small id="contextHint">商丘本地参考</small>
+        </span>
+        <label class="context-field">
+          <span>地区</span>
+          <select id="regionSelect" aria-label="选择所在县市区">
+            <option>睢阳区</option>
+            <option>梁园区</option>
+            <option>永城市</option>
+            <option>民权县</option>
+            <option>睢县</option>
+            <option>宁陵县</option>
+            <option>柘城县</option>
+            <option>虞城县</option>
+            <option>夏邑县</option>
+          </select>
+        </label>
+        <label class="context-field">
+          <span>参考日期</span>
+          <input id="dateInput" type="date" value="2026-11-08" min="2026-10-01" max="2027-06-30">
+        </label>
+        <label class="context-field">
+          <span>天气</span>
+          <select id="weatherSelect" aria-label="选择演示天气">
+            <option value="normal">雨前</option>
+            <option value="cold">强降温</option>
+            <option value="rain">连雨</option>
+            <option value="wind">大风</option>
+            <option value="drought">偏干</option>
+          </select>
+        </label>
+        <button class="mode-button" id="dialectToggle" type="button" aria-pressed="false">
+          <span>田</span>田间话
+        </button>
+        <button class="listen-button" id="listenButton" type="button" aria-pressed="false">
+          <span>◉</span><b>听今天</b>
+        </button>
+      </div>
+
+      <div class="top-actions">
+        <span class="demo-pill"><i></i>业务示意 · 非实时遥感</span>
+        <button class="farm-open-button" type="button" data-open-farm>我的农田</button>
+        <button class="text-toggle" id="textToggle" type="button" aria-pressed="false">
+          <span>大字</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <aside class="left-rail" aria-label="今日农事判断">
+        <section class="decision-card" id="decisionCard">
+          <div class="decision-kicker">
+            <span>今日农事判断</span>
+            <span class="level-tag" id="decisionLevel">先查看</span>
+          </div>
+          <p class="decision-date" id="decisionDate">11月8日 · 农历九月十九</p>
+          <h1 id="decisionTitle">先看东侧低洼区</h1>
+          <p class="decision-reason" id="decisionReason">未来 24 小时有短时降雨。东侧地块偏低，先确认排水沟通畅，再安排其他农事。</p>
+
+          <ol class="action-list" id="actionList">
+            <li><span>01</span><p><b>先看</b>东侧地块是否已经积水</p></li>
+            <li><span>02</span><p><b>再做</b>清理地头排水口，拍一张沟渠照片</p></li>
+            <li><span>03</span><p><b>不急着</b>全田灌水，雨后再看墒情</p></li>
+          </ol>
+
+          <div class="evidence-box">
+            <span>判断依据</span>
+            <p id="decisionEvidence">天气预报 + 地块低洼标记 + 当前分蘖期。用于演示，实际以现场和农技员判断为准。</p>
+          </div>
+
+          <div class="decision-actions" data-html2canvas-ignore="true">
+            <button class="primary-button" id="recordAction" type="button">记入今日农事</button>
+            <button class="quiet-button" id="explainAction" type="button">查看判断依据</button>
+            <button class="share-card-button" id="shareCardButton" type="button">生成今日农事卡片</button>
+          </div>
+          <p class="scan-finding-note" id="scanFindingNote" hidden>AI巡田新发现：西北角墒情偏干，3天后复查</p>
+        </section>
+
+        <section class="plot-card">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">地块数字档案</span>
+              <h2 id="plotName">村东三亩地</h2>
+            </div>
+            <button class="plot-status farm-manage-button" type="button" data-open-farm>配置农田</button>
+          </div>
+          <p class="plot-location" id="plotLocation">商丘市睢阳区 · 3.2 亩 · 壤土 · 可灌溉</p>
+
+          <div class="plot-facts">
+            <div><span>作物</span><strong id="plotCrop">冬小麦</strong></div>
+            <div><span>参考阶段</span><strong id="plotStage">分蘖期</strong></div>
+            <div><span>播种后参考</span><strong id="plotDays">24 天</strong></div>
+          </div>
+
+          <div class="record-strip">
+            <div>
+              <span>今日农事</span>
+              <strong id="recordCount">1 项待确认</strong>
+            </div>
+            <button id="recordShortcut" type="button">去记录</button>
+          </div>
+        </section>
+
+        <details class="ai-chat-panel" id="aiChatPanel">
+          <summary>问田明白（AI农事问答）</summary>
+          <div class="ai-chat-body">
+            <p class="chat-context" id="chatContext"></p>
+            <div class="chat-suggestions" id="chatSuggestions" aria-label="建议问题">
+              <button type="button" data-question="麦子叶尖发黄咋办">麦子叶尖发黄咋办</button>
+              <button type="button" data-question="今天能不能施肥">今天能不能施肥</button>
+              <button type="button" data-question="东边低洼下雨前要干啥">东边低洼下雨前要干啥</button>
+            </div>
+            <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
+            <form class="chat-compose" id="chatForm">
+              <input id="chatInput" type="text" maxlength="300" placeholder="问一句地里的事…" aria-label="输入农事问题" autocomplete="off">
+              <button id="chatSend" type="submit">发送</button>
+            </form>
+          </div>
+        </details>
+      </aside>
+
+      <section class="center-stage">
+        <div class="twin-card">
+          <div class="twin-toolbar">
+            <div class="twin-title">
+              <span class="eyebrow">三维地块数字孪生</span>
+              <h2>从一块地，看见今天该做的事</h2>
+              <p><span class="live-dot"></span>地块状态已同步 <span id="syncTime">刚刚</span></p>
+            </div>
+
+            <div class="layer-switch" aria-label="农情图层">
+              <button type="button" data-layer="risk" aria-pressed="true">风险</button>
+              <button type="button" data-layer="vigor" aria-pressed="false">长势</button>
+              <button type="button" data-layer="moisture" aria-pressed="false">墒情</button>
+            </div>
+          </div>
+
+          <div class="scene-frame">
+            <div id="scene" class="scene" aria-label="当前农田三维业务示意"></div>
+            <div class="webgl-fallback" id="webglFallback" hidden>
+              <svg viewBox="0 0 760 460" role="img" aria-label="村东三亩地二维地块示意图">
+                <defs>
+                  <linearGradient id="fallbackSky" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#c9dcd6"/>
+                    <stop offset=".62" stop-color="#e9ead5"/>
+                    <stop offset="1" stop-color="#d5c3a0"/>
+                  </linearGradient>
+                  <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="8" stdDeviation="9" flood-opacity=".14"/>
+                  </filter>
+                </defs>
+                <rect width="760" height="460" fill="url(#fallbackSky)"/>
+                <path d="M104 334 232 118 666 150 602 390Z" fill="#9a896c" filter="url(#softShadow)"/>
+                <path d="m179 306 93-143 358 24-49 167Z" fill="#c7b797"/>
+                <path d="m199 291 86-109 97 9-87 109Z" fill="#6d8b61"/>
+                <path d="m303 198 112 10-84 109-103-10Z" fill="#4f7f58"/>
+                <path d="m432 209 107 10-55 111-105-11Z" fill="#648b5d"/>
+                <path d="m511 226 77 8-38 88-68-8Z" fill="#7b8e58"/>
+                <path d="m238 304 287 22-9 29-286-24Z" fill="#4c7980"/>
+                <path d="m193 286 86-108 6 2-85 111Z" fill="#479383"/>
+                <path d="m301 196 245 22-3 5-244-23Z" fill="#479383"/>
+                <path d="m540 219 43 4-41 113-6-1Z" fill="#b05d42"/>
+                <circle cx="404" cy="270" r="14" fill="#d49a37" stroke="#fff" stroke-width="4"/>
+                <text x="425" y="275" font-size="13" fill="#17382a">东侧低洼区</text>
+                <circle cx="361" cy="218" r="12" fill="#b34935" stroke="#fff" stroke-width="4"/>
+                <text x="379" y="222" font-size="13" fill="#17382a">北侧弱苗区</text>
+                <g fill="#fff" stroke="#68796d" stroke-width="2">
+                  <circle cx="219" cy="158" r="10"/><path d="M219 168v52m-15-33h30"/>
+                </g>
+                <text x="655" y="350" font-size="12" fill="#4d6255" text-anchor="end">二维降级视图</text>
+              </svg>
+              <div class="fallback-copy">
+                <strong>当前设备未启用三维渲染</strong>
+                <span>上方二维地块图和所有文字判断仍可使用。三维不会阻断今日农事任务。</span>
+              </div>
+            </div>
+            <div class="pins" id="pins" aria-label="地块标记"></div>
+            <div class="infra-labels" id="infraLabels" aria-hidden="true"></div>
+
+            <div class="scene-badge">
+              <span id="scenePlotName">睢阳区 · 村东三亩地</span>
+              <strong id="sceneContextLabel">雨前 · 分蘖期 · 3.2 亩 · 6 个管理区</strong>
+            </div>
+
+            <div class="layer-legend" id="layerLegend">
+              <span><i class="legend-dot risk"></i>重点查看</span>
+              <span><i class="legend-dot watch"></i>持续留意</span>
+              <span><i class="legend-dot normal"></i>状态平稳</span>
+            </div>
+
+            <div class="scene-caption">
+              <span>空间关系</span>
+              <p id="layerCaption">风险图层：红橙色区域需要优先查看，颜色始终配合文字说明。</p>
+            </div>
+
+            <div class="scan-status" id="scanStatus" aria-live="polite">
+              <span class="scan-pulse"></span>
+              <p id="scanStatusCopy">AI巡田示意 · 正在校准地块边界</p>
+              <strong id="scanPercent">0%</strong>
+              <i class="scan-progress-track" aria-hidden="true"><b id="scanProgressBar"></b></i>
+            </div>
+
+            <div class="compass" aria-hidden="true">
+              <span>北</span>
+              <i></i>
+            </div>
+            <div class="scan-finding-pin" id="scanFindingPin" hidden aria-label="西北角轻微干旱趋势">
+              <i></i><span>西北角 · 轻微干旱趋势</span>
+            </div>
+          </div>
+
+          <div class="scene-controls">
+            <div class="control-block">
+              <span class="control-label">看哪里</span>
+              <div class="segmented" id="cameraControls">
+                <button type="button" data-view="overview" aria-pressed="true">全田</button>
+                <button type="button" data-view="top" aria-pressed="false">俯视</button>
+                <button type="button" data-view="canal" aria-pressed="false">水源</button>
+                <button type="button" data-view="crop" aria-pressed="false">苗情</button>
+              </div>
+            </div>
+
+            <div class="control-block stage-control">
+              <span class="control-label">生育期示意</span>
+              <div class="segmented" id="stageControls">
+                <button type="button" data-stage="emergence" aria-pressed="false">出苗</button>
+                <button type="button" data-stage="tillering" aria-pressed="true">分蘖</button>
+                <button type="button" data-stage="overwintering" aria-pressed="false">越冬</button>
+                <button type="button" data-stage="regreening" aria-pressed="false">返青</button>
+                <button type="button" data-stage="jointing" aria-pressed="false">拔节</button>
+                <button type="button" data-stage="mature" aria-pressed="false">成熟</button>
+              </div>
+            </div>
+
+            <button class="scan-button" id="scanButton" type="button">
+              <span class="scan-icon"></span>
+              <span><b>AI巡田示意</b><small>识别差异地块</small></span>
+            </button>
+          </div>
+        </div>
+
+        <section class="week-card" aria-label="七日农事窗口">
+          <div class="week-head">
+            <div>
+              <span>七日农事窗口</span>
+              <small id="weekRange">11月8日—11月14日 · 演示情形</small>
+            </div>
+            <b>点日历，换判断</b>
+          </div>
+          <div class="week-days" id="weekDays"></div>
+        </section>
+
+        <section class="meaning-strip" aria-label="应用价值">
+          <div class="meaning-intro">
+            <span class="eyebrow">为什么不是一块普通的 3D 屏</span>
+            <h2>把“看不懂的数据”，变成“做得到的农事”。</h2>
+          </div>
+          <div class="meaning-item">
+            <b>看得见</b>
+            <p>地块、灌渠、低洼区在同一张图上，不再只靠记忆找位置。</p>
+          </div>
+          <div class="meaning-item">
+            <b>说得清</b>
+            <p>每个提示都有天气、地块和生育期依据，方便和家里人商量。</p>
+          </div>
+          <div class="meaning-item">
+            <b>做得到</b>
+            <p>一次只给一条优先动作，做完可记入当天农事档案。</p>
+          </div>
+        </section>
+      </section>
+
+      <aside class="right-rail" aria-label="地块体检与区域状态">
+        <section class="health-card">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">地块体检</span>
+              <h2 id="healthTitle">2 处需要留意</h2>
+            </div>
+            <span class="health-seal" id="healthSeal">有雨</span>
+          </div>
+          <p class="health-summary" id="healthSummary">天气会影响低洼区，但全田整体仍按分蘖期管理。</p>
+
+          <div class="weather-switch" aria-label="天气场景模拟">
+            <span>天气场景</span>
+            <button class="weather-button" type="button" data-weather="normal" aria-pressed="true">雨前</button>
+            <button class="weather-button" type="button" data-weather="cold" aria-pressed="false">降温</button>
+            <button class="weather-button" type="button" data-weather="rain" aria-pressed="false">连雨</button>
+            <button class="weather-button" type="button" data-weather="wind" aria-pressed="false">大风</button>
+            <button class="weather-button" type="button" data-weather="drought" aria-pressed="false">干旱</button>
+          </div>
+
+          <div class="health-metrics">
+            <div><strong id="riskMetric">2</strong><span>关注区域</span></div>
+            <div><strong id="zoneMetric">6</strong><span>管理分区</span></div>
+            <div><strong id="actionMetric">1</strong><span>优先动作</span></div>
+          </div>
+
+          <div class="data-row">
+            <span>参考信息</span>
+            <div>
+              <i>天气预报</i>
+              <i>地块档案</i>
+              <i>巡田记录</i>
+            </div>
+          </div>
+        </section>
+
+        <section class="zone-card">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow" id="zoneSectionLabel">我的管理区块</span>
+              <h2>先看哪一块？</h2>
+            </div>
+            <span class="zone-help">点地块定位</span>
+          </div>
+          <div class="zone-grid" id="zoneGrid"></div>
+
+          <div class="route-box">
+            <div class="route-heading">
+              <span>建议查看顺序</span>
+              <b>先风险，后对照</b>
+            </div>
+            <ol class="route-list" id="routeList"></ol>
+          </div>
+
+          <div class="zone-detail" id="zoneDetail">
+            <div>
+              <span class="zone-detail-index" id="zoneDetailIndex">01</span>
+              <div>
+                <h3 id="zoneDetailTitle">选择一个地块</h3>
+                <p id="zoneDetailText">点击三维地块或上方区域，查看当前管理提示。</p>
+              </div>
+            </div>
+            <div class="zone-detail-footer">
+              <span class="zone-detail-tag" id="zoneDetailTag">待选择</span>
+              <button class="zone-edit-button" id="editSelectedZoneButton" type="button">编辑这个区块</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="safety-note">
+          <div>
+            <span>使用边界</span>
+            <p>系统只做风险提示和农事参考，不替代农技员，不提供农药剂量，也不把演示数据说成实时监测。拿不准时联系当地农技员，或拨打 12316 三农服务热线。</p>
+          </div>
+          <strong id="localServiceLabel">睢阳区 · 本地参考</strong>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="farm-manager" id="farmManager" hidden>
+    <button class="farm-scrim" id="farmScrim" type="button" aria-label="关闭农田配置"></button>
+    <section class="farm-panel" role="dialog" aria-modal="true" aria-labelledby="farmManagerTitle">
+      <header class="farm-panel-head">
+        <div>
+          <span class="eyebrow">我的农田 · 本地保存</span>
+          <h2 id="farmManagerTitle">把地块建成自己的数字田</h2>
+          <p>一块农田可包含多个场地（管理区块）。选择作物、播期、灌溉和分区后，保存会立即重建三维地块与风险查看顺序。</p>
+        </div>
+        <button class="farm-close" id="farmClose" type="button" aria-label="关闭">×</button>
+      </header>
+
+      <div class="farm-panel-body">
+        <aside class="farm-library" aria-label="已保存农田">
+          <div class="farm-library-head">
+            <span>已保存农田</span>
+            <button id="newFarmButton" type="button">＋ 新建</button>
+          </div>
+          <div class="farm-list" id="farmList"></div>
+          <div class="farm-library-note">
+            <b>数据边界</b>
+            <p>本机演示会保存到浏览器 localStorage。云端移植后应写入用户自己的农田档案，不会冒充真实卫星或传感器数据。</p>
+          </div>
+        </aside>
+
+        <form class="farm-form" id="farmForm">
+          <input id="farmIdInput" type="hidden">
+          <div class="farm-form-grid">
+            <label class="farm-field farm-field-wide">
+              <span>农田名称</span>
+              <input id="farmNameInput" type="text" maxlength="24" placeholder="例如：村东三亩地" required>
+            </label>
+            <label class="farm-field">
+              <span>所在地区</span>
+              <select id="farmRegionInput"></select>
+            </label>
+            <label class="farm-field">
+              <span>面积（亩）</span>
+              <input id="farmAreaInput" type="number" min="0.1" max="1000" step="0.1" required>
+            </label>
+            <label class="farm-field">
+              <span>种植作物</span>
+              <select id="farmCropInput">
+                <option value="wheat">冬小麦</option>
+                <option value="rice">水稻</option>
+                <option value="corn">夏玉米</option>
+                <option value="soybean">大豆</option>
+                <option value="cotton">棉花</option>
+                <option value="other">其他作物</option>
+              </select>
+            </label>
+            <label class="farm-field">
+              <span>播种日期</span>
+              <input id="farmSowingInput" type="date" required>
+            </label>
+            <label class="farm-field">
+              <span>土壤</span>
+              <select id="farmSoilInput">
+                <option>壤土</option>
+                <option>砂壤土</option>
+                <option>黏土</option>
+                <option>不确定</option>
+              </select>
+            </label>
+            <label class="farm-field">
+              <span>灌溉条件</span>
+              <select id="farmIrrigationInput">
+                <option>渠灌</option>
+                <option>井灌</option>
+                <option>排灌</option>
+                <option>雨养</option>
+                <option>不确定</option>
+              </select>
+            </label>
+            <label class="farm-field">
+              <span>田块排列</span>
+              <select id="farmLayoutInput">
+                <option value="standard">标准分区</option>
+                <option value="grid">规则网格</option>
+                <option value="strip">长条田块</option>
+              </select>
+            </label>
+            <label class="farm-field">
+              <span>初始分区数</span>
+              <select id="farmZoneCountInput">
+                <option value="1">1 个管理区块</option>
+                <option value="2">2 个管理区块</option>
+                <option value="3">3 个管理区块</option>
+                <option value="4">4 个管理区块</option>
+                <option value="5">5 个管理区块</option>
+                <option value="6" selected>6 个管理区块</option>
+                <option value="7">7 个管理区块</option>
+                <option value="8">8 个管理区块</option>
+                <option value="9">9 个管理区块</option>
+                <option value="10">10 个管理区块</option>
+                <option value="11">11 个管理区块</option>
+                <option value="12">12 个管理区块</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="farm-config-summary" id="farmConfigSummary" aria-live="polite"></div>
+
+          <section class="zone-editor-card">
+            <div class="zone-editor-head">
+              <div>
+                <span>管理区块</span>
+                <small>给每个区块命名，并选择最需要关注的情况。</small>
+              </div>
+              <button id="addZoneButton" type="button">＋ 加一个区块</button>
+            </div>
+            <div class="zone-editor" id="zoneEditor"></div>
+            <div class="farm-preview" id="farmPreview" aria-label="农田分区预览"></div>
+          </section>
+
+          <p class="farm-form-hint" id="farmFormHint">修改“初始分区数”会按当前形状重建分区，可再逐个改名。</p>
+          <p class="farm-form-error" id="farmFormError" role="alert"></p>
+
+          <footer class="farm-form-actions">
+            <button class="farm-delete" id="deleteFarmButton" type="button">删除当前农田</button>
+            <span></span>
+            <button class="farm-cancel" id="farmCancel" type="button">取消</button>
+            <button class="farm-save" type="submit">保存并查看三维</button>
+          </footer>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  <noscript>
+    <div class="no-script">请开启 JavaScript 使用三维演示。二维地块列表和今日任务仍可按页面文字查看。</div>
+  </noscript>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module" src="./v2.js?v=22"></script>
+</body>
+</html>
