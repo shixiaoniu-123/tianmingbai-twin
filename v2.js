@@ -3116,6 +3116,67 @@ function typeChatAnswer(text) {
   return bubble;
 }
 
+const AI_API_BASE = String(window.TIANMINGBAI_API_BASE || 'https://440483c4f24b93.lhr.life').replace(/\/+$/, '');
+const AI_HISTORY_KEY = 'tianmingbai:ai-history';
+let aiHistory = [];
+try {
+  const saved = JSON.parse(localStorage.getItem(AI_HISTORY_KEY) || '[]');
+  if (Array.isArray(saved)) aiHistory = saved.slice(-6).filter((t) => t && t.content);
+} catch (_) {
+  aiHistory = [];
+}
+
+function saveAiHistory() {
+  aiHistory = aiHistory.slice(-6);
+  try { localStorage.setItem(AI_HISTORY_KEY, JSON.stringify(aiHistory)); } catch (_) {}
+}
+
+function appendAiDecision(payload) {
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-message assistant';
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'display:flex;flex-direction:column;gap:5px;line-height:1.62';
+
+  const addLine = (label, text, bold) => {
+    const line = document.createElement('div');
+    if (bold) line.style.cssText = 'font-weight:700';
+    line.textContent = label ? `${label}${text}` : text;
+    wrap.appendChild(line);
+    return line;
+  };
+
+  addLine('', `${payload.verdict}　·　优先级${payload.priority}`, true);
+  if (payload.reason) addLine('依据：', payload.reason);
+
+  const actions = Array.isArray(payload.actions) ? payload.actions.filter(Boolean) : [];
+  if (actions.length) {
+    const label = document.createElement('div');
+    label.textContent = payload.refuse ? '去核实：' : '今天先做：';
+    wrap.appendChild(label);
+    const list = document.createElement('ol');
+    list.style.cssText = 'margin:0;padding-left:18px';
+    actions.forEach((action) => {
+      const item = document.createElement('li');
+      item.textContent = action;
+      list.appendChild(item);
+    });
+    wrap.appendChild(list);
+  }
+
+  if (payload.window) addLine('时间窗：', payload.window);
+  if (payload.refuse && payload.refuse_reason) addLine('为什么不能替你定：', payload.refuse_reason);
+
+  const meta = document.createElement('div');
+  meta.style.cssText = 'opacity:.72;font-size:.92em';
+  meta.textContent = `置信度${payload.confidence}　·　依据当前地块实时生成`;
+  wrap.appendChild(meta);
+
+  bubble.appendChild(wrap);
+  chatMessages.appendChild(bubble);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+  return bubble;
+}
+
 async function sendChatQuestion(rawQuestion) {
   const question = String(rawQuestion || '').trim();
   if (!question || chatSend.disabled) return;
@@ -3127,33 +3188,38 @@ async function sendChatQuestion(rawQuestion) {
   chatSend.textContent = '发送中';
   const waiting = appendChatMessage('田明白正看着当前地块想…', 'assistant');
   const controller = new AbortController();
-  const timeoutId = window.setTimeout(() => controller.abort(), 50000);
+  const timeoutId = window.setTimeout(() => controller.abort(), 45000);
 
   try {
-    const response = await fetch('http://127.0.0.1:8771/api/chat', {
+    if (!AI_API_BASE) throw new Error('未配置 AI 服务地址');
+    const response = await fetch(`${AI_API_BASE}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        user_message: question,
-        field_context: currentFieldContext()
+        question: question,
+        field_context: currentFieldContext(),
+        history: aiHistory.slice(-4)
       }),
       signal: controller.signal
     });
     const data = await response.json().catch(() => ({}));
     waiting.remove();
     if (!response.ok || data.error) {
-      const message = data.code === 'missing_key'
-        ? '请配置 DEEPSEEK_API_KEY'
-        : (data.message || '网络或key问题');
+      const message = data.code === 'rate_limited'
+        ? '问得有点急，歇一分钟再问'
+        : (data.message || 'AI 服务暂时连不上');
       appendChatMessage(message, 'assistant', 'error');
       appendLocalDecisionFallback();
       return;
     }
-    if (!data.content) throw new Error('回答为空');
-    typeChatAnswer(String(data.content).trim());
+    if (!data.verdict) throw new Error('回答为空');
+    appendAiDecision(data);
+    aiHistory.push({ role: 'user', content: question });
+    aiHistory.push({ role: 'assistant', content: `${data.verdict}；${data.reason || ''}` });
+    saveAiHistory();
   } catch (_) {
     waiting.remove();
-    appendChatMessage('网络或key问题', 'assistant', 'error');
+    appendChatMessage('AI 服务暂时连不上', 'assistant', 'error');
     appendLocalDecisionFallback();
   } finally {
     clearTimeout(timeoutId);
