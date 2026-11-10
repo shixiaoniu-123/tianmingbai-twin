@@ -3119,7 +3119,7 @@ function typeChatAnswer(text) {
 const AI_API_BASE = String(
   window.TIANMINGBAI_API_BASE
   || (() => { try { return localStorage.getItem('tianmingbai:api') || ''; } catch (_) { return ''; } })()
-  || 'https://8874db0f1bfdef.lhr.life'
+  || 'https://tqnog-180-184-45-117.run.pinggy-free.link'
 ).replace(/\/+$/, '');
 const AI_HISTORY_KEY = 'tianmingbai:ai-history';
 let aiHistory = [];
@@ -3198,7 +3198,7 @@ async function sendChatQuestion(rawQuestion) {
     if (!AI_API_BASE) throw new Error('未配置 AI 服务地址');
     const response = await fetch(`${AI_API_BASE}/api/chat`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Pinggy-No-Screen': 'true' },
       body: JSON.stringify({
         question: question,
         field_context: currentFieldContext(),
@@ -3767,7 +3767,7 @@ window.addEventListener('pagehide', (event) => {
       const timer = setTimeout(() => controller.abort(), 45000);
       const response = await fetch(`${AI_API_BASE}/api/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Pinggy-No-Screen': 'true' },
         body: JSON.stringify({ question: q, field_context: fieldContext(), history: history.slice(-4) }),
         signal: controller.signal
       });
@@ -3798,8 +3798,7 @@ window.addEventListener('pagehide', (event) => {
       event.preventDefault();
       ask(input.value);
     }
-});
-  
+  });
   root.querySelectorAll('.dock-chip').forEach((chip) => {
     chip.addEventListener('click', () => ask(chip.textContent));
   });
