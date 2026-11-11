@@ -518,19 +518,37 @@
   </script>
   <script>
 (function(){
-  var base='', launched=false;
+  var launched=false;
   function launch(){
     if(launched) return; launched=true;
-    var s=document.createElement('script');
-    s.type='module';
-    s.src='./v2.js?v=32';
-    document.body.appendChild(s);
+    var sc=document.createElement('script');
+    sc.type='module';
+    sc.src='./v2.js?v=33';
+    document.body.appendChild(sc);
   }
   var timer=setTimeout(launch,2500);
+  function apply(b){
+    if(b){window.TIANMINGBAI_API_BASE=String(b).replace(/\/+$/,'');}
+  }
+  function fromApi(){
+    var u='https://api.github.com/repos/shixiaoniu-123/tianmingbai-twin/contents/api.json?t='+Date.now();
+    return fetch(u,{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(o){
+      if(!o||!o.content) return null;
+      var txt; try{ txt=atob(String(o.content).replace(/\n/g,'')); }catch(e){ return null; }
+      var j; try{ j=JSON.parse(txt); }catch(e){ return null; }
+      return (j&&j.base)||null;
+    }).catch(function(){return null;});
+  }
+  function fromPages(){
+    return fetch('./api.json?t='+Date.now(),{cache:'no-store'})
+      .then(function(r){return r.json();})
+      .then(function(j){return (j&&j.base)||null;})
+      .catch(function(){return null;});
+  }
   try{
-    fetch('./api.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
-      if(j&&j.base){base=String(j.base).replace(/\/+$/,'');window.TIANMINGBAI_API_BASE=base;}
-    }).catch(function(){}).then(function(){clearTimeout(timer);launch();});
+    fromApi().then(function(b){return b||fromPages();}).then(function(b){
+      apply(b); clearTimeout(timer); launch();
+    }).catch(function(){clearTimeout(timer);launch();});
   }catch(e){clearTimeout(timer);launch();}
 })();
 </script>
