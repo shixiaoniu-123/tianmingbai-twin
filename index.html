@@ -523,12 +523,15 @@
     if(launched) return; launched=true;
     var sc=document.createElement('script');
     sc.type='module';
-    sc.src='./v2.js?v=33';
+    sc.src='./v2.js?v=34';
     document.body.appendChild(sc);
   }
   var timer=setTimeout(launch,2500);
   function apply(b){
-    if(b){window.TIANMINGBAI_API_BASE=String(b).replace(/\/+$/,'');}
+    if(!b) return;
+    b=String(b).replace(/\/+$/,'');
+    window.TIANMINGBAI_API_BASE=b;
+    try{ localStorage.setItem('tianmingbai:api', b); }catch(e){}
   }
   function fromApi(){
     var u='https://api.github.com/repos/shixiaoniu-123/tianmingbai-twin/contents/api.json?t='+Date.now();
@@ -546,7 +549,9 @@
       .catch(function(){return null;});
   }
   try{
-    fromApi().then(function(b){return b||fromPages();}).then(function(b){
+    var apiP=fromApi(), pagesP=fromPages();
+    var deadline=new Promise(function(res){setTimeout(function(){res(null);},1500);});
+    Promise.race([apiP,deadline]).then(function(b){ return b || pagesP; }).then(function(b){
       apply(b); clearTimeout(timer); launch();
     }).catch(function(){clearTimeout(timer);launch();});
   }catch(e){clearTimeout(timer);launch();}
