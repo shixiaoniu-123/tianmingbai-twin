@@ -516,6 +516,23 @@
       }
     }
   </script>
-  <script type="module" src="./v2.js?v=31"></script>
+  <script>
+(function(){
+  var base='', launched=false;
+  function launch(){
+    if(launched) return; launched=true;
+    var s=document.createElement('script');
+    s.type='module';
+    s.src='./v2.js?v=32';
+    document.body.appendChild(s);
+  }
+  var timer=setTimeout(launch,2500);
+  try{
+    fetch('./api.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+      if(j&&j.base){base=String(j.base).replace(/\/+$/,'');window.TIANMINGBAI_API_BASE=base;}
+    }).catch(function(){}).then(function(){clearTimeout(timer);launch();});
+  }catch(e){clearTimeout(timer);launch();}
+})();
+</script>
 </body>
 </html>
