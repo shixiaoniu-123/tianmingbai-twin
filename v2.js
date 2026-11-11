@@ -3121,6 +3121,59 @@ const AI_API_BASE = String(
   || (() => { try { return localStorage.getItem('tianmingbai:api') || ''; } catch (_) { return ''; } })()
   || 'https://1ca4760ed1a2bb.lhr.life'
 ).replace(/\/+$/, '');
+let AI_API_LIVE = AI_API_BASE;
+async function refreshAiBase() {
+  try {
+    const u = `https://api.github.com/repos/shixiaoniu-123/tianmingbai-twin/contents/api.json?t=${Date.now()}`;
+    const r = await fetch(u, { cache: 'no-store' });
+    if (r.ok) {
+      const o = await r.json();
+      if (o && o.content) {
+        const j = JSON.parse(atob(String(o.content).replace(/\n/g, '')));
+        if (j && j.base) {
+          AI_API_LIVE = String(j.base).replace(/\/+$/, '');
+          try { localStorage.setItem('tianmingbai:api', AI_API_LIVE); } catch (_) {}
+          return true;
+        }
+      }
+    }
+  } catch (_) {}
+  try {
+    const r = await fetch(`./api.json?t=${Date.now()}`, { cache: 'no-store' });
+    const j = await r.json();
+    if (j && j.base) {
+      AI_API_LIVE = String(j.base).replace(/\/+$/, '');
+      try { localStorage.setItem('tianmingbai:api', AI_API_LIVE); } catch (_) {}
+      return true;
+    }
+  } catch (_) {}
+  return false;
+}
+async function postChat(body) {
+  let lastErr = null;
+  for (let i = 0; i < 3; i += 1) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 45000);
+    try {
+      const r = await fetch(`${AI_API_LIVE}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: controller.signal
+      });
+      clearTimeout(timer);
+      return r;
+    } catch (e) {
+      clearTimeout(timer);
+      lastErr = e;
+      if (i < 2) {
+        const ok = await refreshAiBase();
+        if (!ok) await new Promise((res) => setTimeout(res, 1500));
+      }
+    }
+  }
+  throw lastErr || new Error('AI 服务连不上');
+}
 const AI_HISTORY_KEY = 'tianmingbai:ai-history';
 let aiHistory = [];
 try {
@@ -3196,15 +3249,10 @@ async function sendChatQuestion(rawQuestion) {
 
   try {
     if (!AI_API_BASE) throw new Error('未配置 AI 服务地址');
-    const response = await fetch(`${AI_API_BASE}/api/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        question: question,
-        field_context: currentFieldContext(),
-        history: aiHistory.slice(-4)
-      }),
-      signal: controller.signal
+    const response = await postChat({
+      question: question,
+      field_context: currentFieldContext(),
+      history: aiHistory.slice(-4)
     });
     const data = await response.json().catch(() => ({}));
     waiting.remove();
@@ -3765,12 +3813,7 @@ window.addEventListener('pagehide', (event) => {
       if (typeof AI_API_BASE !== 'string' || !AI_API_BASE) throw new Error('页面没有配置 AI 服务地址');
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 45000);
-      const response = await fetch(`${AI_API_BASE}/api/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: q, field_context: fieldContext(), history: history.slice(-4) }),
-        signal: controller.signal
-      });
+      const response = await postChat({ question: q, field_context: fieldContext(), history: history.slice(-4) });
       clearTimeout(timer);
       const payload = await response.json().catch(() => null);
       if (!response.ok || !payload) {
