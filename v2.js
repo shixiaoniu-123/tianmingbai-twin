@@ -885,6 +885,8 @@ const renderer = new THREE.WebGLRenderer({
   powerPreference: 'high-performance'
 });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.12;
@@ -912,6 +914,16 @@ scene.add(hemi);
 
 const sun = new THREE.DirectionalLight(0xffedc8, 2.7);
 sun.position.set(-8, 13, 7);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+sun.shadow.camera.near = 1;
+sun.shadow.camera.far = 40;
+sun.shadow.camera.left = -11;
+sun.shadow.camera.right = 11;
+sun.shadow.camera.top = 11;
+sun.shadow.camera.bottom = -11;
+sun.shadow.bias = -0.0006;
+sun.shadow.camera.updateProjectionMatrix();
 scene.add(sun);
 
 const fill = new THREE.DirectionalLight(0xafd1df, 0.9);
@@ -1002,6 +1014,7 @@ function createGround() {
   });
   const ground = new THREE.Mesh(geometry, material);
   ground.position.y = -0.14;
+  ground.receiveShadow = true;
   world.add(ground);
 }
 createGround();
@@ -1068,6 +1081,7 @@ const fieldPad = new THREE.Mesh(
   new THREE.MeshStandardMaterial({ color: 0x9b896a, roughness: 1 })
 );
 fieldPad.position.set(0, -0.02, 0.02);
+fieldPad.receiveShadow = true;
 world.add(fieldPad);
 
 function addBox(w, h, d, x, y, z, material, parent = world) {
@@ -1412,6 +1426,11 @@ const clouds = new THREE.Group();
   cloud.scale.setScalar(scale);
   clouds.add(cloud);
 });
+world.traverse((object) => {
+  if (!object.isMesh) return;
+  object.receiveShadow = true;
+  if (object.geometry.type !== 'PlaneGeometry') object.castShadow = true;
+});
 world.add(clouds);
 
 function createTuftGeometry() {
@@ -1482,6 +1501,7 @@ function makeRegionMesh(def, index) {
   });
   const soil = new THREE.Mesh(new THREE.BoxGeometry(def.w, 0.1, def.d), soilMaterial);
   soil.position.y = -0.015;
+  soil.receiveShadow = true;
   soil.userData.regionId = def.id;
   group.add(soil);
 
@@ -1523,6 +1543,7 @@ function makeRegionMesh(def, index) {
   }
 
   const crops = new THREE.InstancedMesh(tuftGeometry, cropMaterial, plants.length);
+  crops.castShadow = true;
   crops.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   crops.frustumCulled = false;
   crops.userData.regionId = def.id;
@@ -1534,6 +1555,7 @@ function makeRegionMesh(def, index) {
     side: THREE.DoubleSide
   });
   const heads = new THREE.InstancedMesh(headGeometry, headMaterial, plants.length);
+  heads.castShadow = true;
   heads.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   heads.frustumCulled = false;
   heads.userData.regionId = def.id;
