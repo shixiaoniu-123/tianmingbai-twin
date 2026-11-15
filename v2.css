@@ -1308,8 +1308,8 @@ button:focus-visible, a:focus-visible {
 .zone-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  margin-top: 12px;
+  gap: 5px;
+  margin-top: 8px;
 }
 .zone-button {
   position: relative;
@@ -1428,7 +1428,7 @@ button:focus-visible, a:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 7px;
-  margin-top: 9px;
+  margin-top: 7px;
 }
 .zone-detail-tag {
   display: inline-block;
@@ -2488,8 +2488,8 @@ body.farm-open { overflow: hidden; }
 
 
 /* v38 选中信息卡与点位图标 */
-.zone-metrics { margin-top: 9px; display: grid; gap: 7px; }
-.metric-row { display: grid; grid-template-columns: 52px 1fr 58px; gap: 6px; align-items: center; font-size: 9px; color: var(--muted); }
+.zone-metrics { margin-top: 7px; display: grid; gap: 5px; }
+.metric-row { display: grid; grid-template-columns: 50px 1fr 56px; gap: 6px; align-items: center; font-size: 8.5px; color: var(--muted); }
 .metric-row i { height: 6px; border-radius: 3px; background: #e7ddc6; overflow: hidden; }
 .metric-row b { display: block; height: 100%; border-radius: 3px; transition: width .3s ease; }
 .metric-row em { font-style: normal; text-align: right; font-size: 9px; }
