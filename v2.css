@@ -2502,3 +2502,15 @@ body.farm-open { overflow: hidden; }
 .zone-clear:hover { color: var(--forest); border-color: var(--forest); }
 .pin-icon { font-size: 9px; font-weight: 700; line-height: 1; }
 .layer-legend, .zone-detail-tag { transition: color .3s ease, background .3s ease, border-color .3s ease; }
+
+
+/* v40 点位图标/hover/告警闪烁 */
+.pin-icon { width: 14px; height: 14px; display: grid; place-items: center; font-size: 9px; font-weight: 700; color: var(--mint); }
+.field-pin[data-tag="weak"] .pin-icon { color: #d1a13d; }
+.field-pin[data-tag="low"] .pin-icon, .field-pin[data-tag="canal"] .pin-icon { color: #528b9e; }
+.field-pin[data-tag="dry"] .pin-icon { color: #c9a65e; }
+.field-pin[data-severity="risk"] .pin-icon { color: var(--risk); }
+.field-pin[data-severity="watch"] .pin-icon { color: var(--watch); }
+.field-pin:hover { transform: translate(-50%, -100%) scale(1.12); }
+.field-pin[data-alert="1"] .pin-icon { animation: pinFlash 2s ease-in-out infinite; }
+@keyframes pinFlash { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
