@@ -1138,8 +1138,8 @@ addBox(9.8, 0.04, 0.52, 0, -0.09, 3.77, new THREE.MeshStandardMaterial({ color: 
 
 const waterMaterial = new THREE.MeshStandardMaterial({
   color: 0x527d82,
-  roughness: 0.24,
-  metalness: 0.04,
+  roughness: 0.18,
+  metalness: 0.08,
   transparent: true,
   opacity: 0.62,
   depthWrite: false
@@ -1535,9 +1535,9 @@ function makeRegionMesh(def, index) {
       plants.push({
         x: -def.w / 2 + 0.12 + ix * ((def.w - 0.24) / Math.max(1, cols - 1)) + stagger,
         z: -def.d / 2 + 0.11 + iz * ((def.d - 0.2) / Math.max(1, rows - 1)),
-        scale: 0.82 + random() * 0.3,
+        scale: 0.8 + random() * 0.34,
         rotation: random() * Math.PI * 2,
-        color: 0.94 + random() * 0.11
+        color: (random() < 0.34 ? 0.9 : random() < 0.67 ? 0.98 : 1.07)
       });
     }
   }
@@ -1571,6 +1571,20 @@ function makeRegionMesh(def, index) {
     group.add(ridge);
     ridges.push(ridge);
   }
+  const bermMaterial = new THREE.MeshStandardMaterial({ color: 0x9a8258, roughness: 1 });
+  const berms = [
+    [def.w + 0.1, 0.03, 0.09, 0, 0.022, -def.d / 2],
+    [def.w + 0.1, 0.03, 0.09, 0, 0.022, def.d / 2],
+    [0.09, 0.03, def.d + 0.1, -def.w / 2, 0.022, 0],
+    [0.09, 0.03, def.d + 0.1, def.w / 2, 0.022, 0]
+  ].map(([bw, bh, bd, bx, by, bz]) => {
+    const berm = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, bd), bermMaterial);
+    berm.position.set(bx, by, bz);
+    berm.userData.regionId = def.id;
+    berm.castShadow = true;
+    group.add(berm);
+    return berm;
+  });
 
   const overlayMaterial = new THREE.MeshBasicMaterial({
     color: 0x2f8e7c,
@@ -1587,7 +1601,7 @@ function makeRegionMesh(def, index) {
   const edgeMaterial = new THREE.LineBasicMaterial({
     color: 0x2b8e80,
     transparent: true,
-    opacity: 0.32
+    opacity: 0.55
   });
   const edge = new THREE.LineLoop(
     new THREE.BufferGeometry().setFromPoints([
@@ -2441,6 +2455,9 @@ function renderZoneState() {
   pinElements.forEach((pin, id) => {
     const region = regions.find((item) => item.id === id);
     pin.dataset.severity = riskFor(id);
+    if (region) pin.dataset.tag = region.tag;
+    const alert = riskFor(id) !== 'normal' || ['weak', 'low', 'dry', 'canal'].includes(region?.tag);
+    pin.dataset.alert = alert ? '1' : '0';
     pin.classList.toggle('selected', id === state.selected);
     pin.setAttribute('aria-pressed', String(id === state.selected));
     const icon = pin.querySelector('.pin-icon');
@@ -2510,6 +2527,7 @@ function renderLayer() {
     region.edgeMaterial.color.setHex(layerColor(region.id));
     region.edgeMaterial.opacity = state.selected === region.id ? 0.95 : severity === 'normal' ? 0.24 : 0.6;
     region.selectedCorner.visible = state.selected === region.id;
+    region.selectedCorner.material.color.setHex(layerColor(region.id));
   });
 }
 
@@ -2537,9 +2555,11 @@ function applyWeather() {
   water.visible = state.weather !== 'drought';
   eastDitchWater.visible = state.weather !== 'drought';
   eastDitchWaterMaterial.opacity = state.weather === 'rain' ? 0.86 : state.weather === 'normal' ? 0.16 : 0.08;
+  const soilTint = { normal: '#786449', cold: '#716a5c', rain: '#6c6049', wind: '#7d6a4d', drought: '#8a6f46' }[state.weather] || '#786449';
   regionObjects.forEach((region) => {
     region.paddy.visible = Boolean(activeCrop().paddy);
     region.paddyMaterial.opacity = state.weather === 'rain' ? 0.62 : state.weather === 'drought' ? 0.24 : 0.42;
+    region.soilMaterial.color.set(soilTint);
   });
   waterGlints.forEach((glint) => {
     glint.visible = state.weather !== 'drought';
