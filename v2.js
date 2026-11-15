@@ -895,7 +895,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.07;
 controls.enablePan = false;
-controls.minDistance = 7;
+controls.minDistance = 2.2;
 controls.maxDistance = 24;
 controls.minPolarAngle = 0.12;
 controls.maxPolarAngle = 1.38;
@@ -1026,7 +1026,9 @@ function addNeighbourFields() {
     { x: -10.1, z: 7.7, w: 7.2, d: 4.3, color: 0x7c8a64, rot: 0.04 },
     { x: 10.2, z: 7.5, w: 7.0, d: 4.4, color: 0x8f835f, rot: -0.06 },
     { x: -3.4, z: -9.4, w: 7.0, d: 3.2, color: 0x798663, rot: -0.03 },
-    { x: 3.8, z: -9.5, w: 6.1, d: 3.0, color: 0x8b8a64, rot: 0.02 }
+    { x: 3.8, z: -9.5, w: 6.1, d: 3.0, color: 0x8b8a64, rot: 0.02 },
+    { x: -12.6, z: 1.4, w: 6.2, d: 4.2, color: 0x86855f, rot: 0.05 },
+    { x: 12.7, z: 1.6, w: 6.0, d: 4.1, color: 0x778a5e, rot: -0.04 }
   ];
   fields.forEach((field) => {
     const mesh = new THREE.Mesh(
@@ -1265,6 +1267,31 @@ function makeTractor(x, z, rotation = 0) {
 }
 makeTractor(-6.8, 5.73, 0.08);
 
+function addHayBale(x, z, rotation = 0) {
+  const bale = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.2, 0.2, 0.32, 14),
+    new THREE.MeshStandardMaterial({ color: 0xc9a65e, roughness: 1 })
+  );
+  bale.rotation.z = Math.PI / 2;
+  bale.rotation.y = rotation;
+  bale.position.set(x, 0.2, z);
+  world.add(bale);
+}
+addHayBale(-6.05, 5.35, 0.3);
+addHayBale(-5.45, 5.72, -0.2);
+
+const fencePostGeo = new THREE.BoxGeometry(0.055, 0.3, 0.055);
+for (let i = 0; i <= 8; i++) {
+  const post = new THREE.Mesh(fencePostGeo, shared.trunk);
+  post.position.set(-5.0 + i * 1.25, 0.18, -5.08);
+  world.add(post);
+}
+for (let i = 0; i <= 8; i++) {
+  const post = new THREE.Mesh(fencePostGeo, shared.trunk);
+  post.position.set(-5.28, 0.18, -4.6 + i * 1.15);
+  world.add(post);
+}
+
 function addTree(x, z, scale = 1, variation = 0) {
   const group = new THREE.Group();
   const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.1, 0.72, 6), shared.trunk);
@@ -1301,7 +1328,8 @@ function addTree(x, z, scale = 1, variation = 0) {
   [-4.9, 7.0, 0.72, 2], [-1.8, 7.3, 0.62, 0], [1.9, 7.2, 0.7, 1], [4.8, 6.7, 0.62, 3],
   [-8.8, -7.6, 0.72, 1], [-6.9, -7.8, 0.7, 3], [-3.1, -7.9, 0.66, 0],
   [2.7, -7.8, 0.7, 2], [5.5, -7.9, 0.67, 1], [8.1, -7.6, 0.72, 3],
-  [-11.2, 2.2, 0.7, 2], [11.2, 3.3, 0.72, 0]
+  [-11.2, 2.2, 0.7, 2], [11.2, 3.3, 0.72, 0],
+  [-13.4, -1.4, 0.66, 1], [13.3, -1.0, 0.68, 3], [-0.2, -11.6, 0.6, 2]
 ].forEach((args) => addTree(...args));
 
 function addFarmHouse(x, z, scale = 1) {
@@ -1413,6 +1441,7 @@ function createTuftGeometry() {
 }
 
 const tuftGeometry = createTuftGeometry();
+const headGeometry = new THREE.CapsuleGeometry(0.022, 0.13, 3, 6);
 const regionObjects = [];
 const regionRoot = new THREE.Group();
 world.add(regionRoot);
@@ -1478,6 +1507,17 @@ function makeRegionMesh(def, index) {
   crops.frustumCulled = false;
   crops.userData.regionId = def.id;
   group.add(crops);
+
+  const headMaterial = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    roughness: 0.85,
+    side: THREE.DoubleSide
+  });
+  const heads = new THREE.InstancedMesh(headGeometry, headMaterial, plants.length);
+  heads.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  heads.frustumCulled = false;
+  heads.userData.regionId = def.id;
+  group.add(heads);
 
   const overlayMaterial = new THREE.MeshBasicMaterial({
     color: 0x2f8e7c,
@@ -1563,6 +1603,7 @@ function makeRegionMesh(def, index) {
     paddyMaterial,
     cropMaterial,
     crops,
+    heads,
     plants,
     overlay,
     overlayMaterial,
@@ -1579,7 +1620,7 @@ function makeRegionMesh(def, index) {
 function disposeRegionObjects() {
   regionObjects.forEach((region) => {
     region.group.traverse((child) => {
-      if (child.geometry && child.geometry !== tuftGeometry) child.geometry.dispose();
+      if (child.geometry && child.geometry !== tuftGeometry && child.geometry !== headGeometry) child.geometry.dispose();
       if (child.material) {
         const materials = Array.isArray(child.material) ? child.material : [child.material];
         materials.forEach((material) => material.dispose());
@@ -2218,6 +2259,9 @@ function updateCropColors() {
   cropColorScratch.set(crop.color || stage.color);
   regionObjects.forEach((region) => {
     region.crops.count = Math.max(1, Math.floor(region.plants.length * stage.density * crop.densityScale));
+    const headOn = stage.id === 'jointing' || stage.id === 'mature';
+    region.heads.count = headOn ? region.plants.length : 0;
+    const headColor = new THREE.Color(state.stage === 'mature' ? '#c9a452' : '#86a85e');
     for (let i = 0; i < region.plants.length; i++) {
       const plant = region.plants[i];
       colorScratch.copy(baseStageColor);
@@ -2226,8 +2270,10 @@ function updateCropColors() {
       colorScratch.multiplyScalar(plant.color);
       if (state.stage === 'mature') colorScratch.offsetHSL((plant.color - 1) * 0.012, 0.02, (plant.color - 1) * 0.05);
       region.crops.setColorAt(i, colorScratch);
+      if (headOn) region.heads.setColorAt(i, headColor);
     }
     if (region.crops.instanceColor) region.crops.instanceColor.needsUpdate = true;
+    if (region.heads.instanceColor) region.heads.instanceColor.needsUpdate = true;
   });
 }
 
@@ -2236,15 +2282,25 @@ function updateCropMatrices() {
   const crop = activeCrop();
   regionObjects.forEach((region) => {
     region.crops.count = Math.max(1, Math.floor(region.plants.length * stage.density * crop.densityScale));
+    const headOn = stage.id === 'jointing' || stage.id === 'mature';
     region.plants.forEach((plant, index) => {
       dummy.position.set(plant.x, 0.045, plant.z);
       dummy.rotation.set(0, plant.rotation, 0);
       dummy.scale.set(1, stage.height * crop.heightScale * plant.scale, 1);
       dummy.updateMatrix();
       region.crops.setMatrixAt(index, dummy.matrix);
+      const headTop = 0.045 + 0.66 * stage.height * crop.heightScale * plant.scale;
+      dummy.position.set(plant.x, headTop + 0.05, plant.z);
+      dummy.rotation.set(0, plant.rotation, 0);
+      dummy.scale.set(1, 1, 1);
+      dummy.updateMatrix();
+      region.heads.setMatrixAt(index, dummy.matrix);
     });
+    region.heads.count = headOn ? region.plants.length : 0;
     region.crops.instanceMatrix.needsUpdate = true;
+    region.heads.instanceMatrix.needsUpdate = true;
     region.crops.computeBoundingSphere();
+    region.heads.computeBoundingSphere();
   });
 }
 
@@ -2393,6 +2449,18 @@ function selectRegion(id) {
   renderLayer();
   renderSelectedInScene();
   const region = regions.find((item) => item.id === id);
+  const anchor = regionObjects.find((item) => item.id === id)?.center
+    || new THREE.Vector3(region.x, 0.5, region.z);
+  const mobile = window.matchMedia('(max-width: 720px)').matches;
+  const offset = mobile ? [2.6, 3.6, 4.2] : [2.0, 2.9, 3.1];
+  cameraAnimation = {
+    fromPos: camera.position.clone(),
+    fromTarget: controls.target.clone(),
+    toPos: anchor.clone().add(new THREE.Vector3(...offset)),
+    toTarget: anchor,
+    started: performance.now(),
+    duration: 820
+  };
   showToast(`已定位 ${region.name}：${regionHint(region)}`);
 }
 
