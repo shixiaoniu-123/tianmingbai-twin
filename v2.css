@@ -2485,3 +2485,19 @@ body.farm-open { overflow: hidden; }
     scrollbar-color: rgba(63, 99, 73, .28) transparent;
   }
 }
+
+
+/* v38 选中信息卡与点位图标 */
+.zone-metrics { margin-top: 9px; display: grid; gap: 7px; }
+.metric-row { display: grid; grid-template-columns: 52px 1fr 58px; gap: 6px; align-items: center; font-size: 9px; color: var(--muted); }
+.metric-row i { height: 6px; border-radius: 3px; background: #e7ddc6; overflow: hidden; }
+.metric-row b { display: block; height: 100%; border-radius: 3px; transition: width .3s ease; }
+.metric-row em { font-style: normal; text-align: right; font-size: 9px; }
+.metric-meta { display: flex; justify-content: space-between; gap: 8px; font-size: 9px; color: var(--muted); }
+.metric-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.metric-tags span { font-size: 8px; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); }
+.metric-note { margin: 0; font-size: 8px; color: var(--muted); }
+.zone-clear { min-height: 28px; padding: 0 8px; border: 1px solid var(--line); border-radius: 5px; color: var(--muted); background: transparent; font-size: 9px; cursor: pointer; }
+.zone-clear:hover { color: var(--forest); border-color: var(--forest); }
+.pin-icon { font-size: 9px; font-weight: 700; line-height: 1; }
+.layer-legend, .zone-detail-tag { transition: color .3s ease, background .3s ease, border-color .3s ease; }
