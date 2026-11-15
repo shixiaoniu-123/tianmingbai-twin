@@ -19,6 +19,7 @@ const cropProfiles = {
     heightScale: 1,
     densityScale: 1,
     color: '#397653',
+    head: true,
     guidance: '冬小麦先看苗情、墒情和天气窗口，具体水肥管理按品种、播期和当地农技指导。'
   },
   rice: {
@@ -30,6 +31,7 @@ const cropProfiles = {
     densityScale: 0.88,
     color: '#4b8a57',
     paddy: true,
+    head: true,
     guidance: '水稻先看水层、田埂和排水口，具体晒田、灌水时间按栽培方式和当地农技指导。'
   },
   corn: {
@@ -40,6 +42,7 @@ const cropProfiles = {
     heightScale: 1.34,
     densityScale: 0.62,
     color: '#5f934d',
+    head: true,
     guidance: '玉米先看苗齐、倒伏和根区墒情，大风后不要只看叶片，还要看根和茎。'
   },
   soybean: {
@@ -50,6 +53,7 @@ const cropProfiles = {
     heightScale: 0.68,
     densityScale: 0.78,
     color: '#3e8055',
+    head: false,
     guidance: '大豆先看出苗均匀度、花期长势和结荚情况，异常持续时拍照并联系农技员。'
   },
   cotton: {
@@ -60,6 +64,7 @@ const cropProfiles = {
     heightScale: 1.08,
     densityScale: 0.7,
     color: '#517f50',
+    head: false,
     guidance: '棉花先看苗情、蕾铃和风后倒伏，具体化控与水肥安排按当地种植模式执行。'
   },
   other: {
@@ -70,6 +75,7 @@ const cropProfiles = {
     heightScale: 0.88,
     densityScale: 0.8,
     color: '#4d8758',
+    head: false,
     guidance: '请先核对作物和播期。缺少作物资料时，系统只做通用巡田提示，不提供诊断和用药建议。'
   }
 };
@@ -1097,6 +1103,20 @@ const bermGeo = new THREE.BoxGeometry(0.28, 0.09, 0.85);
   world.add(berm);
 });
 
+const pebbleGeo = new THREE.IcosahedronGeometry(0.05, 0);
+const pebbleMat = new THREE.MeshStandardMaterial({ color: 0x8d8271, roughness: 1, flatShading: true });
+const pebbleRandom = seeded(3301);
+for (let i = 0; i < 26; i += 1) {
+  const pebble = new THREE.Mesh(pebbleGeo, pebbleMat);
+  const side = i % 4;
+  if (side === 0) pebble.position.set(-5.0 + pebbleRandom() * 10, 0.1, -5.05);
+  else if (side === 1) pebble.position.set(-5.0 + pebbleRandom() * 10, 0.1, 5.05);
+  else if (side === 2) pebble.position.set(-5.28, 0.1, -4.8 + pebbleRandom() * 9.6);
+  else pebble.position.set(5.28, 0.1, -4.8 + pebbleRandom() * 9.6);
+  pebble.scale.setScalar(0.6 + pebbleRandom() * 0.9);
+  world.add(pebble);
+}
+
 const canalBank = new THREE.MeshStandardMaterial({ color: 0x8e8069, roughness: 1 });
 addBox(9.85, 0.18, 0.16, 0, 0.05, 3.44, canalBank);
 addBox(9.85, 0.18, 0.16, 0, 0.05, 4.1, canalBank);
@@ -1519,6 +1539,17 @@ function makeRegionMesh(def, index) {
   heads.userData.regionId = def.id;
   group.add(heads);
 
+  const ridgeMaterial = new THREE.MeshStandardMaterial({ color: 0x8a7350, roughness: 1 });
+  const ridges = [];
+  for (let iz = 0; iz < rows; iz += 1) {
+    const rz = -def.d / 2 + 0.11 + iz * ((def.d - 0.2) / Math.max(1, rows - 1));
+    const ridge = new THREE.Mesh(new THREE.BoxGeometry(def.w - 0.16, 0.018, 0.05), ridgeMaterial);
+    ridge.position.set(0, 0.02, rz);
+    ridge.userData.regionId = def.id;
+    group.add(ridge);
+    ridges.push(ridge);
+  }
+
   const overlayMaterial = new THREE.MeshBasicMaterial({
     color: 0x2f8e7c,
     transparent: true,
@@ -1604,6 +1635,7 @@ function makeRegionMesh(def, index) {
     cropMaterial,
     crops,
     heads,
+    ridges,
     plants,
     overlay,
     overlayMaterial,
@@ -2259,7 +2291,7 @@ function updateCropColors() {
   cropColorScratch.set(crop.color || stage.color);
   regionObjects.forEach((region) => {
     region.crops.count = Math.max(1, Math.floor(region.plants.length * stage.density * crop.densityScale));
-    const headOn = stage.id === 'jointing' || stage.id === 'mature';
+    const headOn = (stage.id === 'jointing' || stage.id === 'mature') && crop.head !== false;
     region.heads.count = headOn ? region.plants.length : 0;
     const headColor = new THREE.Color(state.stage === 'mature' ? '#c9a452' : '#86a85e');
     for (let i = 0; i < region.plants.length; i++) {
@@ -2282,7 +2314,7 @@ function updateCropMatrices() {
   const crop = activeCrop();
   regionObjects.forEach((region) => {
     region.crops.count = Math.max(1, Math.floor(region.plants.length * stage.density * crop.densityScale));
-    const headOn = stage.id === 'jointing' || stage.id === 'mature';
+    const headOn = (stage.id === 'jointing' || stage.id === 'mature') && crop.head !== false;
     region.plants.forEach((plant, index) => {
       dummy.position.set(plant.x, 0.045, plant.z);
       dummy.rotation.set(0, plant.rotation, 0);
@@ -3506,6 +3538,50 @@ document.querySelectorAll('.layer-switch button').forEach((button) => {
 
 document.querySelectorAll('#cameraControls button').forEach((button) => {
   button.addEventListener('click', () => setCameraView(button.dataset.view));
+});
+
+const tourButton = document.createElement('button');
+tourButton.type = 'button';
+tourButton.dataset.view = '__tour';
+tourButton.setAttribute('aria-pressed', 'false');
+tourButton.textContent = '自主巡田';
+document.getElementById('cameraControls').appendChild(tourButton);
+
+let autoTour = false;
+let tourIndex = 0;
+let tourTimer = null;
+
+function scheduleTour(delay) {
+  if (!autoTour) return;
+  tourTimer = window.setTimeout(tourStep, delay);
+}
+
+function tourStep() {
+  if (!autoTour || !regions.length) {
+    scheduleTour(2000);
+    return;
+  }
+  const target = regions[tourIndex % regions.length];
+  tourIndex += 1;
+  selectRegion(target.id);
+  scheduleTour(3800);
+}
+
+function setAutoTour(on) {
+  autoTour = on;
+  tourButton.setAttribute('aria-pressed', String(on));
+  tourButton.textContent = on ? '停止巡田' : '自主巡田';
+  if (on) {
+    tourIndex = 0;
+    tourStep();
+  } else {
+    window.clearTimeout(tourTimer);
+  }
+}
+
+tourButton.addEventListener('click', () => setAutoTour(!autoTour));
+controls.addEventListener('start', () => {
+  if (autoTour) setAutoTour(false);
 });
 
 document.querySelectorAll('#stageControls button').forEach((button) => {
