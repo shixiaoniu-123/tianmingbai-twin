@@ -1707,7 +1707,7 @@ function buildPins() {
     button.type = 'button';
     button.className = 'field-pin';
     button.dataset.region = def.id;
-    button.innerHTML = `<span class="pin-dot"></span><span class="pin-label">${def.short}</span>`;
+    button.innerHTML = `<span class="pin-dot"></span><span class="pin-icon"></span><span class="pin-label">${def.short}</span>`;
     button.addEventListener('click', (event) => {
       event.stopPropagation();
       selectRegion(def.id);
@@ -2251,6 +2251,44 @@ function regionHint(def) {
   return weathers[state.weather].zoneHints[def.role] || def.note;
 }
 
+const layerNameMap = { risk: '风险', vigor: '长势', moisture: '墒情' };
+const zoneTagLabel = { weak: '苗情偏弱', low: '低洼标记', canal: '近渠位置', dry: '易偏干', control: '对照区', general: '一般管理' };
+
+function layerStatusLabel(region) {
+  if (state.layer === 'vigor') {
+    if (region.tag === 'weak') return '偏弱';
+    if (region.tag === 'control') return '壮苗';
+    return '正常';
+  }
+  if (state.layer === 'moisture') {
+    if (region.tag === 'low' || region.tag === 'canal') return '偏湿';
+    if (region.tag === 'dry') return '偏干';
+    return '正常';
+  }
+  return severityLabel(region.id);
+}
+
+function zoneDemoMetrics(region) {
+  const moisture = region.moisture === '偏湿' ? 72 : region.moisture === '偏干' ? 34 : 56;
+  const vigor = region.vigor === '偏弱' ? 38 : region.tag === 'control' ? 78 : 62;
+  const trend = region.tag === 'weak' ? '↓ 偏弱' : region.tag === 'low' ? '↑ 偏湿' : '→ 持平';
+  return { moisture, vigor, trend };
+}
+
+function zoneBasisTags(region) {
+  return [
+    `天气·${weathers[state.weather].name}`,
+    `生育期·${stageDefinition(state.stage).name}`,
+    `地块·${zoneTagLabel[region.tag] || region.short}`
+  ];
+}
+
+function layerIcon(region) {
+  if (state.layer === 'vigor') return region.tag === 'weak' ? '苗' : region.tag === 'control' ? '壮' : '禾';
+  if (state.layer === 'moisture') return (region.tag === 'low' || region.tag === 'canal') ? '水' : region.tag === 'dry' ? '干' : '禾';
+  return riskFor(region.id) === 'risk' ? '!' : riskFor(region.id) === 'watch' ? '●' : '✓';
+}
+
 function zoneByTag(tag) {
   return regions.find((region) => region.tag === tag);
 }
@@ -2320,6 +2358,7 @@ function updateCropColors() {
       const plant = region.plants[i];
       colorScratch.copy(baseStageColor);
       if (region.def.tag === 'weak') colorScratch.multiplyScalar(0.9);
+      if (state.selected && region.def.id !== state.selected) colorScratch.multiplyScalar(0.85);
       if (state.stage !== 'mature') colorScratch.lerp(cropColorScratch, 0.22);
       colorScratch.multiplyScalar(plant.color);
       if (state.stage === 'mature') colorScratch.offsetHSL((plant.color - 1) * 0.012, 0.02, (plant.color - 1) * 0.05);
@@ -2400,9 +2439,12 @@ function renderZoneState() {
     button.querySelector('i').title = severityLabel(id);
   });
   pinElements.forEach((pin, id) => {
+    const region = regions.find((item) => item.id === id);
     pin.dataset.severity = riskFor(id);
     pin.classList.toggle('selected', id === state.selected);
     pin.setAttribute('aria-pressed', String(id === state.selected));
+    const icon = pin.querySelector('.pin-icon');
+    if (icon && region) icon.textContent = layerIcon(region);
   });
 
   const severityOrder = { risk: 0, watch: 1, normal: 2 };
@@ -2416,11 +2458,37 @@ function renderZoneState() {
     : '');
 
   const selected = regions.find((item) => item.id === state.selected);
+  const metricsRoot = document.getElementById('zoneMetrics');
+  const clearBtn = document.getElementById('zoneClear');
   if (selected) {
+    const metrics = zoneDemoMetrics(selected);
     zoneDetailIndex.textContent = selected.index;
     zoneDetailTitle.textContent = selected.name;
     zoneDetailText.textContent = regionHint(selected);
-    zoneDetailTag.textContent = `${severityLabel(selected.id)} · 长势${selected.vigor} · 墒情${selected.moisture}`;
+    zoneDetailTag.textContent = `${layerNameMap[state.layer]}层 · ${layerStatusLabel(selected)}`;
+    if (metricsRoot) metricsRoot.hidden = false;
+    const mBar = document.getElementById('zoneMoistureBar');
+    const mVal = document.getElementById('zoneMoistureVal');
+    const vBar = document.getElementById('zoneVigorBar');
+    const vVal = document.getElementById('zoneVigorVal');
+    if (mBar) { mBar.style.width = `${metrics.moisture}%`; mBar.style.background = '#528b9e'; }
+    if (mVal) mVal.textContent = `湿度 ${metrics.moisture}%`;
+    if (vBar) { vBar.style.width = `${metrics.vigor}%`; vBar.style.background = selected.tag === 'weak' ? '#d49a37' : '#3f8b70'; }
+    if (vVal) vVal.textContent = selected.vigor;
+    const daysEl = document.getElementById('zoneDays');
+    if (daysEl) daysEl.textContent = `播后第 ${getDaysAfterSowing(state.date)} 天`;
+    const trendEl = document.getElementById('zoneTrend');
+    if (trendEl) trendEl.textContent = `近 3 天 ${metrics.trend}`;
+    const basisEl = document.getElementById('zoneBasis');
+    if (basisEl) basisEl.innerHTML = zoneBasisTags(selected).map((tag) => `<span>${tag}</span>`).join('');
+    if (clearBtn) clearBtn.hidden = false;
+  } else {
+    zoneDetailIndex.textContent = '—';
+    zoneDetailTitle.textContent = '选择一个地块';
+    zoneDetailText.textContent = '点击三维地块或上方区域，查看当前管理提示。';
+    zoneDetailTag.textContent = '待选择';
+    if (metricsRoot) metricsRoot.hidden = true;
+    if (clearBtn) clearBtn.hidden = true;
   }
 }
 
@@ -2496,6 +2564,13 @@ function renderSelectedInScene() {
   });
 }
 
+function clearSelection() {
+  state.selected = null;
+  renderZoneState();
+  renderLayer();
+  renderSelectedInScene();
+}
+
 function selectRegion(id) {
   if (!regions.some((region) => region.id === id)) return;
   state.selected = id;
@@ -2513,10 +2588,13 @@ function selectRegion(id) {
     toPos: anchor.clone().add(new THREE.Vector3(...offset)),
     toTarget: anchor,
     started: performance.now(),
-    duration: 820
+    duration: 420
   };
   showToast(`已定位 ${region.name}：${regionHint(region)}`);
 }
+
+const zoneClearButton = document.getElementById('zoneClear');
+zoneClearButton?.addEventListener('click', clearSelection);
 
 function setWeather(id, options = {}) {
   if (!weathers[id]) return;
@@ -3011,6 +3089,7 @@ renderer.domElement.addEventListener('pointerup', (event) => {
   if (samePointer && moved < 7) {
     const region = regionAtPointer(event);
     if (region) selectRegion(region.id);
+    else clearSelection();
   }
 });
 
@@ -3020,6 +3099,7 @@ renderer.domElement.addEventListener('pointermove', (event) => {
   hoverFrame = requestAnimationFrame(() => {
     const region = regionAtPointer(event);
     renderer.domElement.style.cursor = region ? 'pointer' : 'grab';
+    renderer.domElement.title = region ? `${region.name} · ${layerStatusLabel(region)}` : '';
   });
 });
 
