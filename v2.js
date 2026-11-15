@@ -3099,7 +3099,7 @@ renderer.domElement.addEventListener('pointermove', (event) => {
   hoverFrame = requestAnimationFrame(() => {
     const region = regionAtPointer(event);
     renderer.domElement.style.cursor = region ? 'pointer' : 'grab';
-    renderer.domElement.title = region ? `${region.name} · ${layerStatusLabel(region)}` : '';
+    renderer.domElement.title = region ? `${region.def.name} · ${layerStatusLabel(region.def)}` : '';
   });
 });
 
