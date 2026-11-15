@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#183d2d">
   <title>田明白 · 我的农田数字孪生</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231c4d36'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-size='38' font-family='serif' fill='%23fbf8ef'%3E田%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./v2.css?v=31">
+  <link rel="stylesheet" href="./v2.css?v=32">
 </head>
 <body>
   <div class="page">
@@ -349,14 +349,22 @@
 
           <div class="zone-detail" id="zoneDetail">
             <div>
-              <span class="zone-detail-index" id="zoneDetailIndex">01</span>
+              <span class="zone-detail-index" id="zoneDetailIndex">—</span>
               <div>
                 <h3 id="zoneDetailTitle">选择一个地块</h3>
                 <p id="zoneDetailText">点击三维地块或上方区域，查看当前管理提示。</p>
               </div>
             </div>
+            <div class="zone-metrics" id="zoneMetrics" hidden>
+              <div class="metric-row"><span>墒情湿度</span><i><b id="zoneMoistureBar"></b></i><em id="zoneMoistureVal"></em></div>
+              <div class="metric-row"><span>苗情等级</span><i><b id="zoneVigorBar"></b></i><em id="zoneVigorVal"></em></div>
+              <div class="metric-meta"><span id="zoneDays"></span><span id="zoneTrend"></span></div>
+              <div class="metric-tags" id="zoneBasis"></div>
+              <p class="metric-note" id="zoneMetricNote">演示值，需田间复核 · 业务示意·非实时遥感</p>
+            </div>
             <div class="zone-detail-footer">
               <span class="zone-detail-tag" id="zoneDetailTag">待选择</span>
+              <button class="zone-clear" id="zoneClear" type="button" hidden>取消选中</button>
               <button class="zone-edit-button" id="editSelectedZoneButton" type="button">编辑这个区块</button>
             </div>
           </div>
@@ -523,7 +531,7 @@
     if(launched) return; launched=true;
     var sc=document.createElement('script');
     sc.type='module';
-    sc.src='./v2.js?v=37';
+    sc.src='./v2.js?v=38';
     document.body.appendChild(sc);
   }
   var timer=setTimeout(launch,2500);
