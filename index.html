@@ -516,13 +516,22 @@
     <div class="no-script">请开启 JavaScript 使用三维演示。二维地块列表和今日任务仍可按页面文字查看。</div>
   </noscript>
 
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
-      }
-    }
+  <script>
+/* three 加载源：默认走仓库本地 vendor，CDN 只作为兜底（jsdelivr 在国内常被重置） */
+(function(){
+  var maps={
+    local:{'three':'./vendor/three.module.js','three/addons/':'./vendor/addons/'},
+    jsdelivr:{'three':'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js','three/addons/':'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/'},
+    unpkg:{'three':'https://unpkg.com/three@0.180.0/build/three.module.js','three/addons/':'https://unpkg.com/three@0.180.0/examples/jsm/'}
+  };
+  var want=new URLSearchParams(location.search).get('cdn');
+  var source=maps[want]?want:'local';
+  window.__TM_IMPORT_SOURCE=source;
+  var tag=document.createElement('script');
+  tag.type='importmap';
+  tag.textContent=JSON.stringify({imports:maps[source]});
+  document.head.appendChild(tag);
+})();
   </script>
   <script>
 (function(){
@@ -531,8 +540,31 @@
     if(launched) return; launched=true;
     var sc=document.createElement('script');
     sc.type='module';
-    sc.src='./v2.js?v=41';
+    sc.src='./v2.js?v=42';
+    sc.onerror=nextSource;
     document.body.appendChild(sc);
+    setTimeout(function(){
+      if(!window.TIANMINGBAI_READY) nextSource();
+    }, 9000);
+  }
+  function nextSource(){
+    if(window.TIANMINGBAI_READY) return;
+    var order=['local','jsdelivr','unpkg'];
+    var i=order.indexOf(window.__TM_IMPORT_SOURCE||'local');
+    if(i<0||i>=order.length-1){
+      var tip=document.querySelector('.scene-frame');
+      if(tip&&!document.getElementById('tmLoadTip')){
+        var box=document.createElement('div');
+        box.id='tmLoadTip';
+        box.style.cssText='position:absolute;inset:auto 16px 16px;z-index:30;padding:12px 14px;border-radius:12px;background:rgba(252,250,243,.94);border:1px solid rgba(31,74,50,.18);font-size:12.5px;color:#20402c';
+        box.textContent='当前网络未能加载三维库，页面其他功能仍可用，请刷新重试。';
+        tip.appendChild(box);
+      }
+      return;
+    }
+    var u=new URL(location.href);
+    u.searchParams.set('cdn',order[i+1]);
+    location.replace(u.toString());
   }
   var timer=setTimeout(launch,2500);
   function apply(b){
