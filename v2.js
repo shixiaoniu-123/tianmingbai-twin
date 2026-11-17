@@ -352,96 +352,42 @@ const regionProfiles = {
 };
 
 let regions = [
-  {
-    id: 'north-weak',
-    tag: 'weak',
-    role: 'north-weak',
-    index: '01',
-    name: '北侧弱苗区',
-    short: '北侧弱苗',
-    x: -2.25,
-    z: -4.05,
-    w: 4.2,
-    d: 1.85,
-    note: '苗情偏弱，降温与大风天气优先查看。',
-    vigor: '偏弱',
-    moisture: '正常'
-  },
-  {
-    id: 'north-east',
-    tag: 'control',
-    role: 'north-east',
-    index: '02',
-    name: '东北正常区',
-    short: '东北区',
-    x: 2.25,
-    z: -4.05,
-    w: 4.2,
-    d: 1.85,
-    note: '当前苗情较均匀，可作全田对照区。',
-    vigor: '正常',
-    moisture: '正常'
-  },
-  {
-    id: 'west-normal',
-    tag: 'general',
-    role: 'west-normal',
-    index: '03',
-    name: '西侧正常区',
-    short: '西侧区',
-    x: -3.45,
-    z: -1.1,
-    w: 2,
-    d: 3.55,
-    note: '靠近气象站，适合作为田间对照。',
-    vigor: '正常',
-    moisture: '正常'
-  },
-  {
-    id: 'center-normal',
-    tag: 'dry',
-    role: 'center-normal',
-    index: '04',
-    name: '中部正常区',
-    short: '中部区',
-    x: 0,
-    z: -1.1,
-    w: 4.3,
-    d: 3.55,
-    note: '关注群体长势是否均匀。',
-    vigor: '正常',
-    moisture: '偏干'
-  },
-  {
-    id: 'east-low',
-    tag: 'low',
-    role: 'east-low',
-    index: '05',
-    name: '东侧低洼区',
-    short: '东侧低洼',
-    x: 3.45,
-    z: -1.1,
-    w: 2,
-    d: 3.55,
-    note: '地势偏低，降雨时优先检查排水。',
-    vigor: '正常',
-    moisture: '偏湿'
-  },
-  {
-    id: 'south-field',
-    tag: 'canal',
-    role: 'south-field',
-    index: '06',
-    name: '南侧近渠区',
-    short: '南侧近渠',
-    x: 0,
-    z: 2.15,
-    w: 9.15,
-    d: 1.85,
-    note: '靠近灌渠与机耕道，关注倒灌和作业安全。',
-    vigor: '正常',
-    moisture: '正常'
-  }
+  { id: 'north-weak', tag: 'weak', role: 'north-weak', index: '01', block: '西北田块',
+    name: '北侧弱苗区', short: '北侧弱苗', x: -8.3, z: -6.2, w: 2.7, d: 2.9,
+    note: '苗情偏弱，降温与大风天气优先查看。', vigor: '偏弱', moisture: '正常' },
+  { id: 'north-mid', tag: 'general', role: 'general', index: '02', block: '西北田块',
+    name: '北侧中区', short: '北中区', x: -5.3, z: -6.2, w: 2.7, d: 2.9,
+    note: '苗情均匀，常规管理即可。', vigor: '正常', moisture: '正常' },
+  { id: 'north-east-2', tag: 'general', role: 'general', index: '03', block: '西北田块',
+    name: '北侧东区', short: '北东区', x: -2.3, z: -6.2, w: 2.7, d: 2.9,
+    note: '近机耕道，注意地头压实与出苗。', vigor: '正常', moisture: '正常' },
+  { id: 'north-east', tag: 'control', role: 'north-east', index: '04', block: '东北田块',
+    name: '东北正常区', short: '东北区', x: 2.3, z: -6.2, w: 2.7, d: 2.9,
+    note: '当前苗情较均匀，可作全田对照区。', vigor: '正常', moisture: '正常' },
+  { id: 'north-east-mid', tag: 'general', role: 'general', index: '05', block: '东北田块',
+    name: '东北中区', short: '东中区', x: 5.3, z: -6.2, w: 2.7, d: 2.9,
+    note: '常规管理区，关注苗情均匀度。', vigor: '正常', moisture: '正常' },
+  { id: 'east-low', tag: 'low', role: 'east-low', index: '06', block: '东北田块',
+    name: '东侧低洼区', short: '东侧洼地', x: 8.3, z: -6.2, w: 2.7, d: 2.9,
+    note: '地势偏低，降雨时优先检查排水。', vigor: '正常', moisture: '偏湿' },
+  { id: 'west-normal', tag: 'general', role: 'west-normal', index: '07', block: '西南田块',
+    name: '西侧正常区', short: '西侧区', x: -8.3, z: 6.2, w: 2.7, d: 2.9,
+    note: '苗情平稳，按常规节奏管理。', vigor: '正常', moisture: '正常' },
+  { id: 'south-west', tag: 'general', role: 'general', index: '08', block: '西南田块',
+    name: '南侧西区', short: '南西区', x: -5.3, z: 6.2, w: 2.7, d: 2.9,
+    note: '常规管理区，播后长势正常。', vigor: '正常', moisture: '正常' },
+  { id: 'center-normal', tag: 'dry', role: 'center-normal', index: '09', block: '西南田块',
+    name: '中部正常区', short: '中部正常区', x: -2.3, z: 6.2, w: 2.7, d: 2.9,
+    note: '地势略高，连续晴天墒情易偏干。', vigor: '正常', moisture: '偏干' },
+  { id: 'south-field', tag: 'canal', role: 'south-field', index: '10', block: '东南田块',
+    name: '南侧近渠区', short: '南侧近渠', x: 2.3, z: 6.2, w: 2.7, d: 2.9,
+    note: '靠近灌渠与机耕道，关注倒灌和作业安全。', vigor: '正常', moisture: '正常' },
+  { id: 'south-mid', tag: 'general', role: 'general', index: '11', block: '东南田块',
+    name: '南侧中区', short: '南中区', x: 5.3, z: 6.2, w: 2.7, d: 2.9,
+    note: '常规管理区，注意渠边杂草。', vigor: '正常', moisture: '正常' },
+  { id: 'south-east', tag: 'weak', role: 'general', index: '12', block: '东南田块',
+    name: '南侧东区', short: '南东区', x: 8.3, z: 6.2, w: 2.7, d: 2.9,
+    note: '苗情偏弱，建议单独补肥复核。', vigor: '偏弱', moisture: '正常' }
 ];
 
 const standardZoneGeometry = regions.map((zone) => ({
@@ -462,7 +408,7 @@ function inferredTag(x, z, index, count) {
 }
 
 function calculateLayout(count, layout = 'grid') {
-  if (layout === 'standard' && count === 6) {
+  if (layout === 'standard' && standardZoneGeometry.length === count) {
     return standardZoneGeometry.map((geometry, index) => ({ ...geometry, tag: standardZoneGeometry[index].tag }));
   }
 
@@ -914,7 +860,7 @@ scene.fog = new THREE.FogExp2(0xdbe6de, 0.0034);
 })();
 
 const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 180);
-camera.position.set(1.6, 21.5, 19.0);
+camera.position.set(1.8, 23.6, 21.0);
 
 const renderer = new THREE.WebGLRenderer({
   antialias: true,
@@ -943,7 +889,7 @@ controls.enablePan = true;
 controls.panSpeed = 0.75;
 controls.screenSpacePanning = false;
 controls.minDistance = 2.2;
-controls.maxDistance = 46;
+controls.maxDistance = 52;
 controls.minPolarAngle = 0.12;
 controls.maxPolarAngle = 1.38;
 controls.target.set(0, 0.15, 0.3);
@@ -1594,13 +1540,13 @@ addFarmHouse(-1.0, -11.2, 0.46);
     }
   }
 
-  outerField(-13.4, -8.9, 10.6, 7.4, 7);
-  outerField(13.4, -8.9, 10.6, 7.4, 13);
-  outerField(-13.4, 7.2, 10.6, 6.6, 21);
-  outerField(13.4, 7.2, 10.6, 6.6, 29);
+  outerField(-16.0, -8.9, 9.2, 7.4, 7);
+  outerField(16.0, -8.9, 9.2, 7.4, 13);
+  outerField(-16.0, 7.2, 9.2, 6.6, 21);
+  outerField(16.0, 7.2, 9.2, 6.6, 29);
 
   // 机耕道：两条纵向 + 两条横向，把主田与外围田连成路网
-  [[-7.7, 27.5], [7.7, 27.5]].forEach(([x, len]) => {
+  [[-11.3, 27.5], [11.3, 27.5]].forEach(([x, len]) => {
     const road = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.05, len), roadMat);
     road.position.set(x, 0.03, 0);
     world.add(road);
@@ -1611,6 +1557,24 @@ addFarmHouse(-1.0, -11.2, 0.46);
     rutB.position.x = x + 0.3;
     world.add(rutB);
   });
+  // v53 片区内部十字机耕道：把 4 个田块串起来，形成真实路网
+  (function innerRoads(){
+    const roadV = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.05, 21.5), roadMat);
+    roadV.position.set(0, 0.032, 0);
+    world.add(roadV);
+    const rutVa = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.02, 20.6), rutMat);
+    rutVa.position.set(-0.38, 0.056, 0);
+    world.add(rutVa);
+    const rutVb = rutVa.clone(); rutVb.position.x = 0.38; world.add(rutVb);
+    const roadH = new THREE.Mesh(new THREE.BoxGeometry(24.4, 0.05, 1.8), roadMat);
+    roadH.position.set(0, 0.034, 0);
+    world.add(roadH);
+    const rutHa = new THREE.Mesh(new THREE.BoxGeometry(23.5, 0.02, 0.3), rutMat);
+    rutHa.position.set(0, 0.058, -0.38);
+    world.add(rutHa);
+    const rutHb = rutHa.clone(); rutHb.position.z = 0.38; world.add(rutHb);
+  })();
+
   [[-13.6, 34.2], [12.9, 33]].forEach(([z, len]) => {
     const road = new THREE.Mesh(new THREE.BoxGeometry(len, 0.05, 1.7), roadMat);
     road.position.set(0, 0.03, z);
@@ -1978,19 +1942,156 @@ function buildInfraLabels() {
 
 function buildZoneButtons() {
   zoneGrid.innerHTML = '';
+  const blockOrder = [];
   regions.forEach((def) => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'zone-button';
-    button.dataset.zone = def.id;
-    button.innerHTML = `<b>${def.index}</b><span>${def.name}</span><i></i>`;
-    button.addEventListener('click', () => selectRegion(def.id));
-    zoneGrid.appendChild(button);
+    if (!blockOrder.includes(def.block)) blockOrder.push(def.block);
+  });
+  blockOrder.forEach((block) => {
+    const head = document.createElement('div');
+    head.className = 'zone-block-head';
+    const count = regions.filter((def) => def.block === block).length;
+    head.innerHTML = `<b>${block}</b><em>${count} 个区块</em>`;
+    zoneGrid.appendChild(head);
+    regions.filter((def) => def.block === block).forEach((def) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'zone-button';
+      button.dataset.zone = def.id;
+      button.innerHTML = `<b>${def.index}</b><span>${def.name}</span><i></i>`;
+      button.addEventListener('click', () => selectRegion(def.id));
+      zoneGrid.appendChild(button);
+    });
   });
 }
 
+(function injectV53Css() {
+  if (document.getElementById('tmV53Css')) return;
+  const style = document.createElement('style');
+  style.id = 'tmV53Css';
+  style.textContent = `
+    .zone-block-head {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 8px 0 2px;
+      padding: 0 2px 5px;
+      border-bottom: 1px dashed rgba(45, 66, 54, .22);
+      font-size: 12px;
+      letter-spacing: .04em;
+      color: #2d4236;
+    }
+    .zone-block-head b { font-weight: 650; }
+    .zone-block-head em { font-style: normal; font-size: 11px; color: rgba(45, 66, 54, .5); }
+    #tmMiniMap {
+      position: absolute;
+      right: 14px;
+      bottom: 78px;
+      width: 172px;
+      height: 124px;
+      border-radius: 10px;
+      border: 1px solid rgba(45, 66, 54, .18);
+      box-shadow: 0 6px 18px rgba(29, 46, 36, .14);
+      background: rgba(255, 253, 247, .78);
+      backdrop-filter: blur(3px);
+      cursor: pointer;
+      z-index: 6;
+    }
+    #tmMiniMap::after { content: ''; }
+  `;
+  document.head.appendChild(style);
+})();
+
 buildInfraLabels();
 rebuildRegionObjects();
+
+const miniCanvas = document.createElement('canvas');
+miniCanvas.id = 'tmMiniMap';
+miniCanvas.width = 344;
+miniCanvas.height = 248;
+miniCanvas.title = '片区缩略图 · 点击定位区块';
+sceneHost.appendChild(miniCanvas);
+const miniCtx = miniCanvas.getContext('2d');
+const MINI_BX = 10.8;
+const MINI_BZ = 8.8;
+function miniToX(x) { return 12 + ((x + MINI_BX) / (2 * MINI_BX)) * (miniCanvas.width - 24); }
+function miniToZ(z) { return 12 + ((z + MINI_BZ) / (2 * MINI_BZ)) * (miniCanvas.height - 24); }
+function drawMiniMap() {
+  if (!miniCtx) return;
+  const W = miniCanvas.width;
+  const H = miniCanvas.height;
+  miniCtx.clearRect(0, 0, W, H);
+  miniCtx.fillStyle = 'rgba(241, 236, 221, .9)';
+  miniCtx.fillRect(0, 0, W, H);
+  // 田块底色
+  const blockTint = { '西北田块': '#e9e5d3', '东北田块': '#ece7d6', '西南田块': '#e7e3d2', '东南田块': '#ebe6d5' };
+  const blocks = [];
+  regions.forEach((region) => {
+    if (!blocks.includes(region.block)) blocks.push(region.block);
+  });
+  blocks.forEach((block) => {
+    const zones = regions.filter((region) => region.block === block);
+    const minX = Math.min(...zones.map((z) => z.x - z.w / 2)) - 0.35;
+    const maxX = Math.max(...zones.map((z) => z.x + z.w / 2)) + 0.35;
+    const minZ = Math.min(...zones.map((z) => z.z - z.d / 2)) - 0.35;
+    const maxZ = Math.max(...zones.map((z) => z.z + z.d / 2)) + 0.35;
+    miniCtx.fillStyle = blockTint[block] || '#e9e5d3';
+    miniCtx.fillRect(miniToX(minX), miniToZ(minZ), miniToX(maxX) - miniToX(minX), miniToZ(maxZ) - miniToZ(minZ));
+  });
+  // 路网
+  miniCtx.strokeStyle = 'rgba(160, 140, 104, .55)';
+  miniCtx.lineWidth = 3;
+  miniCtx.beginPath();
+  miniCtx.moveTo(miniToX(0), miniToZ(-8.4));
+  miniCtx.lineTo(miniToX(0), miniToZ(8.4));
+  miniCtx.moveTo(miniToX(-10.4), miniToZ(0));
+  miniCtx.lineTo(miniToX(10.4), miniToZ(0));
+  miniCtx.stroke();
+  // 区块
+  regions.forEach((region) => {
+    const sev = riskFor(region.id);
+    const color = sev === 'risk' ? '#c9644a' : sev === 'watch' ? '#d3a03f' : '#5f9c80';
+    const left = miniToX(region.x - region.w / 2);
+    const top = miniToZ(region.z - region.d / 2);
+    const w = miniToX(region.x + region.w / 2) - left;
+    const h = miniToZ(region.z + region.d / 2) - top;
+    miniCtx.fillStyle = sev === 'risk' ? 'rgba(201,100,74,.55)' : sev === 'watch' ? 'rgba(211,160,63,.5)' : 'rgba(95,156,128,.45)';
+    miniCtx.fillRect(left, top, w, h);
+    miniCtx.strokeStyle = region.id === state.selected ? '#1e3b2b' : 'rgba(45,66,54,.35)';
+    miniCtx.lineWidth = region.id === state.selected ? 2.4 : 1;
+    miniCtx.strokeRect(left, top, w, h);
+    miniCtx.fillStyle = color;
+  });
+  // 指北
+  miniCtx.fillStyle = 'rgba(30, 59, 43, .8)';
+  miniCtx.font = '600 20px system-ui, sans-serif';
+  miniCtx.fillText('N', miniCanvas.width - 30, 30);
+  miniCtx.beginPath();
+  miniCtx.moveTo(miniCanvas.width - 22, 40);
+  miniCtx.lineTo(miniCanvas.width - 27, 54);
+  miniCtx.lineTo(miniCanvas.width - 17, 54);
+  miniCtx.closePath();
+  miniCtx.fill();
+}
+miniCanvas.addEventListener('click', (event) => {
+  const rect = miniCanvas.getBoundingClientRect();
+  const px = ((event.clientX - rect.left) / rect.width) * miniCanvas.width;
+  const py = ((event.clientY - rect.top) / rect.height) * miniCanvas.height;
+  let best = null;
+  let bestDist = Infinity;
+  regions.forEach((region) => {
+    const left = miniToX(region.x - region.w / 2);
+    const top = miniToZ(region.z - region.d / 2);
+    const w = miniToX(region.x + region.w / 2) - left;
+    const h = miniToZ(region.z + region.d / 2) - top;
+    if (px >= left && px <= left + w && py >= top && py <= top + h) {
+      const dist = Math.hypot(px - (left + w / 2), py - (top + h / 2));
+      if (dist < bestDist) { bestDist = dist; best = region; }
+    }
+  });
+  if (best) selectRegion(best.id);
+});
 
 let draftZones = [];
 
@@ -2692,6 +2793,8 @@ function renderZoneState() {
     const icon = pin.querySelector('.pin-icon');
     if (icon && region) icon.textContent = layerIcon(region);
   });
+
+  drawMiniMap();
 
   const severityOrder = { risk: 0, watch: 1, normal: 2 };
   const route = [...regions]
@@ -4389,7 +4492,7 @@ window.addEventListener('pagehide', (event) => {
 })();
 
 window.TIANMINGBAI_READY = true;
-window.TM_VERSION = 'v52';
+window.TM_VERSION = 'v53';
 (function injectHoverCss() {
   if (document.getElementById('tmHoverCss')) return;
   const style = document.createElement('style');
