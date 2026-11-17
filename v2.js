@@ -2,12 +2,12 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const stages = [
-  { id: 'emergence', name: '出苗', height: 0.52, density: 0.56, color: '#82a86b' },
-  { id: 'tillering', name: '分蘖', height: 0.76, density: 0.82, color: '#397653' },
-  { id: 'overwintering', name: '越冬', height: 0.64, density: 0.72, color: '#567254' },
-  { id: 'regreening', name: '返青', height: 0.94, density: 1, color: '#4f8d5d' },
-  { id: 'jointing', name: '拔节', height: 1.02, density: 0.96, color: '#60945a' },
-  { id: 'mature', name: '成熟', height: 1.08, density: 1, color: '#c39a45' }
+  { id: 'emergence', name: '出苗', height: 0.24, density: 0.5, color: '#8dbb6b' },
+  { id: 'tillering', name: '分蘖', height: 0.34, density: 0.86, color: '#56a05a' },
+  { id: 'overwintering', name: '越冬', height: 0.29, density: 0.72, color: '#6c8163' },
+  { id: 'regreening', name: '返青', height: 0.42, density: 1, color: '#4f9e55' },
+  { id: 'jointing', name: '拔节', height: 0.52, density: 0.94, color: '#5c9752' },
+  { id: 'mature', name: '成熟', height: 0.6, density: 1, color: '#cbab63' }
 ];
 
 const cropProfiles = {
@@ -874,7 +874,7 @@ if (!webglAvailable) {
 }
 
 const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0xd5dfd2, 0.014);
+scene.fog = new THREE.FogExp2(0xdfe6da, 0.0095);
 
 const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
 camera.position.set(7.4, 13.2, 9.4);
@@ -909,10 +909,10 @@ controls.minPolarAngle = 0.12;
 controls.maxPolarAngle = 1.38;
 controls.target.set(0, 0.15, 0.3);
 
-const hemi = new THREE.HemisphereLight(0xfff5d8, 0x304c39, 1.75);
+const hemi = new THREE.HemisphereLight(0xfff6e2, 0x51694f, 1.95);
 scene.add(hemi);
 
-const sun = new THREE.DirectionalLight(0xffedc8, 2.7);
+const sun = new THREE.DirectionalLight(0xfff0d2, 2.35);
 sun.position.set(-8, 13, 7);
 sun.castShadow = true;
 sun.shadow.mapSize.set(1024, 1024);
@@ -939,9 +939,9 @@ world.rotation.y = -0.06;
 scene.add(world);
 
 const shared = {
-  berm: new THREE.MeshStandardMaterial({ color: 0xcbb998, roughness: 1 }),
-  dirt: new THREE.MeshStandardMaterial({ color: 0xb49d76, roughness: 1 }),
-  soil: new THREE.MeshStandardMaterial({ color: 0x786449, roughness: 1 }),
+  berm: new THREE.MeshStandardMaterial({ color: 0xc9b58c, roughness: 1 }),
+  dirt: new THREE.MeshStandardMaterial({ color: 0xc0ad86, roughness: 1 }),
+  soil: new THREE.MeshStandardMaterial({ color: 0x8a7150, roughness: 1 }),
   trunk: new THREE.MeshStandardMaterial({ color: 0x6e5537, roughness: 1 }),
   white: new THREE.MeshStandardMaterial({ color: 0xe9e7db, roughness: 0.76 }),
   dark: new THREE.MeshStandardMaterial({ color: 0x283d30, roughness: 0.7 }),
@@ -993,10 +993,10 @@ function createGround() {
   const position = geometry.attributes.position;
   const colors = [];
   const palette = [
-    new THREE.Color('#7d8c68'),
-    new THREE.Color('#88936e'),
-    new THREE.Color('#758669'),
-    new THREE.Color('#929371')
+    new THREE.Color('#93a677'),
+    new THREE.Color('#9dae80'),
+    new THREE.Color('#8b9d6d'),
+    new THREE.Color('#a7b58a')
   ];
   for (let i = 0; i < position.count; i++) {
     const x = position.getX(i);
@@ -1021,7 +1021,7 @@ createGround();
 
 function addDistantHills() {
   const material = new THREE.MeshStandardMaterial({
-    color: 0x6f8067,
+    color: 0x8a9d7c,
     roughness: 1,
     flatShading: true
   });
@@ -1040,14 +1040,14 @@ addDistantHills();
 
 function addNeighbourFields() {
   const fields = [
-    { x: -11.8, z: -3.5, w: 7.0, d: 7.3, color: 0x76835e, rot: -0.08 },
-    { x: 12.0, z: -3.6, w: 7.4, d: 7.1, color: 0x8f8c67, rot: 0.09 },
-    { x: -10.1, z: 7.7, w: 7.2, d: 4.3, color: 0x7c8a64, rot: 0.04 },
-    { x: 10.2, z: 7.5, w: 7.0, d: 4.4, color: 0x8f835f, rot: -0.06 },
-    { x: -3.4, z: -9.4, w: 7.0, d: 3.2, color: 0x798663, rot: -0.03 },
-    { x: 3.8, z: -9.5, w: 6.1, d: 3.0, color: 0x8b8a64, rot: 0.02 },
-    { x: -12.6, z: 1.4, w: 6.2, d: 4.2, color: 0x86855f, rot: 0.05 },
-    { x: 12.7, z: 1.6, w: 6.0, d: 4.1, color: 0x778a5e, rot: -0.04 }
+    { x: -11.8, z: -3.5, w: 7.0, d: 7.3, color: 0x9aab7c, rot: -0.08 },
+    { x: 12.0, z: -3.6, w: 7.4, d: 7.1, color: 0xb0ad82, rot: 0.09 },
+    { x: -10.1, z: 7.7, w: 7.2, d: 4.3, color: 0x97a97a, rot: 0.04 },
+    { x: 10.2, z: 7.5, w: 7.0, d: 4.4, color: 0xb3a87d, rot: -0.06 },
+    { x: -3.4, z: -9.4, w: 7.0, d: 3.2, color: 0x9bae7e, rot: -0.03 },
+    { x: 3.8, z: -9.5, w: 6.1, d: 3.0, color: 0xacae80, rot: 0.02 },
+    { x: -12.6, z: 1.4, w: 6.2, d: 4.2, color: 0xa6ab7c, rot: 0.05 },
+    { x: 12.7, z: 1.6, w: 6.0, d: 4.1, color: 0x94a97a, rot: -0.04 }
   ];
   fields.forEach((field) => {
     const mesh = new THREE.Mesh(
@@ -1099,6 +1099,31 @@ addBox(0.14, 0.13, 10.4, 5.35, 0.06, -0.02, shared.berm);
 addBox(11.4, 0.035, 0.64, 0, 0.06, 5.7, shared.dirt);
 addBox(0.64, 0.035, 11.2, 5.78, 0.06, 0.2, shared.dirt);
 
+const pathMaterial = new THREE.MeshStandardMaterial({ color: 0xd3c19c, roughness: 1 });
+addBox(10.3, 0.022, 0.4, 0, 0.042, 0.95, pathMaterial);
+addBox(0.26, 0.022, 3.7, -2.3, 0.042, -1.0, pathMaterial);
+addBox(0.26, 0.022, 1.1, -2.3, 0.042, 1.78, pathMaterial);
+
+function addBush(x, z, scale = 1) {
+  const material = new THREE.MeshStandardMaterial({ color: 0x6f9159, roughness: 1, flatShading: true });
+  const group = new THREE.Group();
+  [[0, 0.16, 0, 0.26], [0.22, 0.12, 0.1, 0.19], [-0.19, 0.11, -0.12, 0.17]].forEach(([bx, by, bz, size]) => {
+    const blob = new THREE.Mesh(new THREE.IcosahedronGeometry(size, 0), material);
+    blob.position.set(bx, by, bz);
+    blob.scale.y = 0.74;
+    blob.castShadow = true;
+    group.add(blob);
+  });
+  group.position.set(x, 0, z);
+  group.scale.setScalar(scale);
+  world.add(group);
+}
+[
+  [-5.9, -5.4, 1], [-5.6, 3.4, 0.85], [5.9, -5.3, 0.9], [5.8, 3.2, 1],
+  [-6.2, 0.6, 0.8], [6.3, -0.6, 0.85], [-4.2, 5.5, 0.75], [4.1, 5.4, 0.8],
+  [-9.4, 6.2, 0.9], [9.2, 6.0, 0.95], [-9.6, -6.6, 0.85], [9.8, -6.4, 0.9]
+].forEach((args) => addBush(...args));
+
 const outerBoundary = new THREE.LineLoop(
   new THREE.BufferGeometry().setFromPoints([
     new THREE.Vector3(-5.31, 0.16, -5.11),
@@ -1137,7 +1162,7 @@ addBox(9.85, 0.18, 0.16, 0, 0.05, 4.1, canalBank);
 addBox(9.8, 0.04, 0.52, 0, -0.09, 3.77, new THREE.MeshStandardMaterial({ color: 0x736b5a, roughness: 1 }));
 
 const waterMaterial = new THREE.MeshStandardMaterial({
-  color: 0x527d82,
+  color: 0x86b0bd,
   roughness: 0.18,
   metalness: 0.08,
   transparent: true,
@@ -1437,28 +1462,29 @@ function createTuftGeometry() {
   const positions = [];
   const indices = [];
   const random = seeded(4711);
-  const bladeCount = 7;
-  const segments = 3;
+  const bladeCount = 9;
+  const segments = 4;
 
   for (let blade = 0; blade < bladeCount; blade++) {
-    const angle = (blade / bladeCount) * Math.PI * 2 + (random() - 0.5) * 0.45;
+    const angle = (blade / bladeCount) * Math.PI * 2 + (random() - 0.5) * 0.5;
     const dx = Math.cos(angle);
     const dz = Math.sin(angle);
     const px = -dz;
     const pz = dx;
-    const radius = 0.012 + random() * 0.035;
-    const height = 0.52 + random() * 0.28;
-    const bend = 0.06 + random() * 0.09;
-    const baseWidth = 0.012 + random() * 0.007;
+    const radius = 0.008 + random() * 0.024;
+    const height = 0.5 + random() * 0.24;
+    const bend = 0.035 + random() * 0.05;
+    const tipDroop = 0.16 + random() * 0.12;
+    const baseWidth = 0.013 + random() * 0.005;
     const startIndex = positions.length / 3;
 
     for (let segment = 0; segment <= segments; segment++) {
       const t = segment / segments;
-      const width = baseWidth * (1 - t * 0.88);
-      const along = radius + bend * t * t;
+      const width = baseWidth * (1 - t * 0.92);
+      const along = radius + bend * t * t * 1.4;
       const cx = dx * along;
       const cz = dz * along;
-      const y = t * height;
+      const y = height * (t - tipDroop * t * t * t);
       positions.push(cx + px * width, y, cz + pz * width);
       positions.push(cx - px * width, y, cz - pz * width);
     }
@@ -1480,7 +1506,7 @@ function createTuftGeometry() {
 }
 
 const tuftGeometry = createTuftGeometry();
-const headGeometry = new THREE.CapsuleGeometry(0.022, 0.13, 3, 6);
+const headGeometry = new THREE.ConeGeometry(0.026, 0.15, 5, 1);
 const regionObjects = [];
 const regionRoot = new THREE.Group();
 world.add(regionRoot);
@@ -1495,7 +1521,7 @@ function makeRegionMesh(def, index) {
   regionRoot.add(group);
 
   const soilMaterial = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#786449'),
+    color: new THREE.Color('#8a7150'),
     map: fieldTexture,
     roughness: 1
   });
@@ -1506,7 +1532,7 @@ function makeRegionMesh(def, index) {
   group.add(soil);
 
   const paddyMaterial = new THREE.MeshStandardMaterial({
-    color: 0x6b9d91,
+    color: 0x7ea9b6,
     transparent: true,
     opacity: 0.42,
     roughness: 0.3,
@@ -1527,17 +1553,17 @@ function makeRegionMesh(def, index) {
   });
   const random = seeded(8100 + index * 101);
   const plants = [];
-  const cols = Math.max(5, Math.floor((def.w - 0.22) / 0.135));
-  const rows = Math.max(6, Math.floor((def.d - 0.2) / 0.17));
+  const cols = Math.max(4, Math.floor((def.w - 0.3) / 0.165));
+  const rows = Math.max(4, Math.floor((def.d - 0.26) / 0.225));
   for (let ix = 0; ix < cols; ix++) {
     for (let iz = 0; iz < rows; iz++) {
-      const stagger = (iz % 2) * 0.035;
+      const stagger = (iz % 2) * 0.05;
       plants.push({
-        x: -def.w / 2 + 0.12 + ix * ((def.w - 0.24) / Math.max(1, cols - 1)) + stagger,
-        z: -def.d / 2 + 0.11 + iz * ((def.d - 0.2) / Math.max(1, rows - 1)),
-        scale: 0.8 + random() * 0.34,
+        x: -def.w / 2 + 0.15 + ix * ((def.w - 0.3) / Math.max(1, cols - 1)) + stagger + (random() - 0.5) * 0.05,
+        z: -def.d / 2 + 0.13 + iz * ((def.d - 0.26) / Math.max(1, rows - 1)) + (random() - 0.5) * 0.05,
+        scale: 0.86 + random() * 0.28,
         rotation: random() * Math.PI * 2,
-        color: (random() < 0.34 ? 0.9 : random() < 0.67 ? 0.98 : 1.07)
+        color: (random() < 0.34 ? 0.92 : random() < 0.67 ? 1 : 1.07)
       });
     }
   }
@@ -1561,17 +1587,17 @@ function makeRegionMesh(def, index) {
   heads.userData.regionId = def.id;
   group.add(heads);
 
-  const ridgeMaterial = new THREE.MeshStandardMaterial({ color: 0x8a7350, roughness: 1 });
+  const ridgeMaterial = new THREE.MeshStandardMaterial({ color: 0x977f56, roughness: 1 });
   const ridges = [];
   for (let iz = 0; iz < rows; iz += 1) {
-    const rz = -def.d / 2 + 0.11 + iz * ((def.d - 0.2) / Math.max(1, rows - 1));
+    const rz = -def.d / 2 + 0.13 + iz * ((def.d - 0.26) / Math.max(1, rows - 1));
     const ridge = new THREE.Mesh(new THREE.BoxGeometry(def.w - 0.16, 0.018, 0.05), ridgeMaterial);
     ridge.position.set(0, 0.02, rz);
     ridge.userData.regionId = def.id;
     group.add(ridge);
     ridges.push(ridge);
   }
-  const bermMaterial = new THREE.MeshStandardMaterial({ color: 0x9a8258, roughness: 1 });
+  const bermMaterial = new THREE.MeshStandardMaterial({ color: 0xbaa275, roughness: 1 });
   const berms = [
     [def.w + 0.1, 0.03, 0.09, 0, 0.022, -def.d / 2],
     [def.w + 0.1, 0.03, 0.09, 0, 0.022, def.d / 2],
@@ -2367,13 +2393,13 @@ function updateCropColors() {
     region.crops.count = Math.max(1, Math.floor(region.plants.length * stage.density * crop.densityScale));
     const headOn = (stage.id === 'jointing' || stage.id === 'mature') && crop.head !== false;
     region.heads.count = headOn ? region.plants.length : 0;
-    const headColor = new THREE.Color(state.stage === 'mature' ? '#c9a452' : '#86a85e');
+    const headColor = new THREE.Color(state.stage === 'mature' ? '#d0ae66' : '#9dbf70');
     for (let i = 0; i < region.plants.length; i++) {
       const plant = region.plants[i];
       colorScratch.copy(baseStageColor);
       if (region.def.tag === 'weak') colorScratch.multiplyScalar(0.9);
       if (state.selected && region.def.id !== state.selected) colorScratch.multiplyScalar(0.85);
-      if (state.stage !== 'mature') colorScratch.lerp(cropColorScratch, 0.22);
+      if (state.stage !== 'mature') colorScratch.lerp(cropColorScratch, 0.1);
       colorScratch.multiplyScalar(plant.color);
       if (state.stage === 'mature') colorScratch.offsetHSL((plant.color - 1) * 0.012, 0.02, (plant.color - 1) * 0.05);
       region.crops.setColorAt(i, colorScratch);
@@ -2396,7 +2422,7 @@ function updateCropMatrices() {
       dummy.scale.set(1, stage.height * crop.heightScale * plant.scale, 1);
       dummy.updateMatrix();
       region.crops.setMatrixAt(index, dummy.matrix);
-      const headTop = 0.045 + 0.66 * stage.height * crop.heightScale * plant.scale;
+      const headTop = 0.045 + 0.62 * stage.height * crop.heightScale * plant.scale;
       dummy.position.set(plant.x, headTop + 0.05, plant.z);
       dummy.rotation.set(0, plant.rotation, 0);
       dummy.scale.set(1, 1, 1);
@@ -2522,8 +2548,8 @@ function renderLayer() {
     const severity = riskFor(region.id);
     region.overlayMaterial.color.setHex(layerColor(region.id));
     region.overlayMaterial.opacity = state.layer === 'risk'
-      ? (severity === 'risk' ? 0.34 : severity === 'watch' ? 0.24 : 0.075)
-      : 0.2;
+      ? (severity === 'risk' ? 0.35 : severity === 'watch' ? 0.29 : 0.24)
+      : 0.28;
     region.edgeMaterial.color.setHex(layerColor(region.id));
     region.edgeMaterial.opacity = state.selected === region.id ? 0.95 : severity === 'normal' ? 0.24 : 0.6;
     region.selectedCorner.visible = state.selected === region.id;
@@ -3843,45 +3869,45 @@ window.addEventListener('pagehide', (event) => {
   style.textContent = `
 #aiChatPanel{display:none!important}
 #askDockRoot{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;width:min(880px,calc(100% - 32px));z-index:9998;font-family:inherit}
-#askDockRoot .dock-body{background:linear-gradient(180deg,rgba(22,36,27,.97),rgba(13,22,17,.985));border:1px solid rgba(198,166,98,.34);border-radius:18px;box-shadow:0 22px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(16px);overflow:hidden}
+#askDockRoot .dock-body{background:rgba(252,250,243,.92);border:1px solid rgba(31,74,50,.16);border-radius:18px;box-shadow:0 18px 44px rgba(24,42,30,.18),inset 0 1px 0 rgba(255,255,255,.7);backdrop-filter:blur(18px);overflow:hidden}
 #askDockRoot .dock-head{display:flex;align-items:center;gap:11px;padding:13px 16px 11px}
 #askDockRoot .dock-badge{width:30px;height:30px;border-radius:9px;background:linear-gradient(150deg,#3f6b4a,#24402c);color:#e9dfbf;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;letter-spacing:1px;box-shadow:inset 0 0 0 1px rgba(233,223,191,.28)}
-#askDockRoot .dock-title{color:#f3efe1;font-size:15px;font-weight:700;letter-spacing:.4px}
-#askDockRoot .dock-sub{color:rgba(243,239,225,.5);font-size:11.5px;margin-top:2px}
-#askDockRoot .dock-live{margin-left:auto;display:flex;align-items:center;gap:6px;color:rgba(243,239,225,.62);font-size:11.5px}
+#askDockRoot .dock-title{color:#20402c;font-size:15px;font-weight:700;letter-spacing:.4px}
+#askDockRoot .dock-sub{color:rgba(32,64,44,.55);font-size:11.5px;margin-top:2px}
+#askDockRoot .dock-live{margin-left:auto;display:flex;align-items:center;gap:6px;color:rgba(32,64,44,.6);font-size:11.5px}
 #askDockRoot .dock-dot{width:7px;height:7px;border-radius:50%;background:#6fbf73;box-shadow:0 0 8px rgba(111,191,115,.8)}
-#askDockRoot .dock-fold{background:none;border:0;color:rgba(243,239,225,.45);font-size:11.5px;cursor:pointer;padding:2px 4px}
-#askDockRoot .dock-fold:hover{color:#e9dfbf}
+#askDockRoot .dock-fold{background:none;border:0;color:rgba(32,64,44,.45);font-size:11.5px;cursor:pointer;padding:2px 4px}
+#askDockRoot .dock-fold:hover{color:#2b4a35}
 #askDockRoot .dock-transcript{max-height:44vh;overflow-y:auto;padding:0 16px;display:flex;flex-direction:column;gap:10px}
 #askDockRoot .dock-transcript:empty{display:none}
-#askDockRoot .ask-q{color:rgba(243,239,225,.55);font-size:12.5px;padding:2px 0 0 2px}
-#askDockRoot .ask-q::before{content:'你问：';color:rgba(198,166,98,.85)}
-#askDockRoot .ask-card{background:rgba(255,255,255,.045);border-radius:13px;padding:13px 15px;border-left:3px solid #c9a227}
+#askDockRoot .ask-q{color:rgba(32,64,44,.55);font-size:12.5px;padding:2px 0 0 2px}
+#askDockRoot .ask-q::before{content:'你问：';color:#94712e}
+#askDockRoot .ask-card{background:rgba(255,255,255,.78);border-radius:13px;padding:13px 15px;border-left:3px solid #c9a227;box-shadow:0 2px 10px rgba(24,42,30,.05)}
 #askDockRoot .ask-card.p-high{border-left-color:#d98324}
 #askDockRoot .ask-card.p-mid{border-left-color:#c9a227}
 #askDockRoot .ask-card.p-low{border-left-color:#6f8f6a}
-#askDockRoot .ask-card.refuse{border-left-color:#b45a4a;background:rgba(180,90,74,.09)}
+#askDockRoot .ask-card.refuse{border-left-color:#b45a4a;background:rgba(180,90,74,.1)}
 #askDockRoot .ask-line1{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
-#askDockRoot .ask-verdict{color:#f7f3e6;font-size:16.5px;font-weight:700;letter-spacing:.3px}
-#askDockRoot .ask-pill{font-size:11px;padding:2px 8px;border-radius:999px;background:rgba(217,131,36,.16);color:#e2a86a;border:1px solid rgba(217,131,36,.34)}
-#askDockRoot .ask-card.p-mid .ask-pill{background:rgba(201,162,39,.15);color:#dcc06a;border-color:rgba(201,162,39,.34)}
-#askDockRoot .ask-card.p-low .ask-pill{background:rgba(111,143,106,.15);color:#93b48d;border-color:rgba(111,143,106,.34)}
-#askDockRoot .ask-card.refuse .ask-pill{background:rgba(180,90,74,.16);color:#e09a8b;border-color:rgba(180,90,74,.34)}
-#askDockRoot .ask-label{color:rgba(198,166,98,.9);font-size:12px;margin-top:9px}
-#askDockRoot .ask-reason{color:rgba(243,239,225,.86);font-size:13px;line-height:1.72;margin-top:3px}
-#askDockRoot .ask-actions{margin:5px 0 0;padding-left:19px;color:rgba(243,239,225,.9);font-size:13px;line-height:1.85}
-#askDockRoot .ask-meta{color:rgba(243,239,225,.42);font-size:11.5px;margin-top:9px;letter-spacing:.2px}
+#askDockRoot .ask-verdict{color:#1b3327;font-size:16.5px;font-weight:700;letter-spacing:.3px}
+#askDockRoot .ask-pill{font-size:11px;padding:2px 8px;border-radius:999px;background:rgba(217,131,36,.16);color:#9a5c12;border:1px solid rgba(217,131,36,.34)}
+#askDockRoot .ask-card.p-mid .ask-pill{background:rgba(201,162,39,.16);color:#8a6a12;border-color:rgba(201,162,39,.34)}
+#askDockRoot .ask-card.p-low .ask-pill{background:rgba(111,143,106,.16);color:#456b46;border-color:rgba(111,143,106,.34)}
+#askDockRoot .ask-card.refuse .ask-pill{background:rgba(180,90,74,.16);color:#8f4132;border-color:rgba(180,90,74,.34)}
+#askDockRoot .ask-label{color:#8a6a29;font-size:12px;margin-top:9px}
+#askDockRoot .ask-reason{color:rgba(28,50,38,.88);font-size:13px;line-height:1.72;margin-top:3px}
+#askDockRoot .ask-actions{margin:5px 0 0;padding-left:19px;color:rgba(28,50,38,.9);font-size:13px;line-height:1.85}
+#askDockRoot .ask-meta{color:rgba(28,50,38,.45);font-size:11.5px;margin-top:9px;letter-spacing:.2px}
 #askDockRoot .dock-input-row{display:flex;gap:10px;padding:11px 16px 4px;align-items:center}
-#askDockRoot .dock-input{flex:1;height:46px;border-radius:12px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.055);color:#f3efe1;font-size:14px;padding:0 15px;outline:none;transition:border-color .18s,background .18s}
-#askDockRoot .dock-input::placeholder{color:rgba(243,239,225,.38)}
-#askDockRoot .dock-input:focus{border-color:rgba(198,166,98,.6);background:rgba(255,255,255,.08)}
+#askDockRoot .dock-input{flex:1;height:46px;border-radius:12px;border:1px solid rgba(31,74,50,.18);background:rgba(255,255,255,.9);color:#1f3a2a;font-size:14px;padding:0 15px;outline:none;transition:border-color .18s,background .18s}
+#askDockRoot .dock-input::placeholder{color:rgba(31,58,42,.4)}
+#askDockRoot .dock-input:focus{border-color:rgba(47,142,124,.55);background:#fff}
 #askDockRoot .dock-send{height:46px;padding:0 22px;border-radius:12px;border:0;cursor:pointer;color:#f4f8f2;font-size:14px;font-weight:600;letter-spacing:.5px;background:linear-gradient(160deg,#43724e,#2b4a35);box-shadow:0 6px 18px rgba(43,74,53,.45);transition:filter .18s,transform .1s}
 #askDockRoot .dock-send:hover{filter:brightness(1.12)}
 #askDockRoot .dock-send:active{transform:translateY(1px)}
 #askDockRoot .dock-send[disabled]{opacity:.55;cursor:default}
 #askDockRoot .dock-chips{display:flex;gap:8px;flex-wrap:wrap;padding:2px 16px 13px}
-#askDockRoot .dock-chip{font-size:12px;color:rgba(243,239,225,.66);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:5px 12px;cursor:pointer;transition:color .16s,border-color .16s}
-#askDockRoot .dock-chip:hover{color:#e9dfbf;border-color:rgba(198,166,98,.45)}
+#askDockRoot .dock-chip{font-size:12px;color:rgba(31,58,42,.7);background:rgba(255,255,255,.72);border:1px solid rgba(31,74,50,.14);border-radius:999px;padding:5px 12px;cursor:pointer;transition:color .16s,border-color .16s}
+#askDockRoot .dock-chip:hover{color:#1f4a33;border-color:rgba(47,142,124,.45)}
 #askDockRoot .dock-mini{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:9998;display:none;align-items:center;gap:9px;padding:11px 18px;border-radius:999px;background:linear-gradient(160deg,#43724e,#2b4a35);color:#f4f8f2;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 12px 30px rgba(0,0,0,.45);border:1px solid rgba(233,223,191,.3)}
 @media (max-width:640px){
   #askDockRoot{bottom:10px;width:calc(100% - 20px)}
