@@ -877,7 +877,7 @@ const scene = new THREE.Scene();
 scene.fog = new THREE.FogExp2(0xdfe6da, 0.0052);
 
 const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 180);
-camera.position.set(2.2, 17.6, 20.4);
+camera.position.set(1.6, 21.5, 19.0);
 
 const renderer = new THREE.WebGLRenderer({
   antialias: true,
@@ -1466,8 +1466,8 @@ addFarmHouse(-1.0, -11.2, 0.46);
 // v47 片区尺度：主田之外再铺 4 块外围田 + 机耕道 + 路边树，让画面从"一小块田"变成"一片农田"
 (function addOuterDistrict(){
   const soilMat = new THREE.MeshStandardMaterial({ color: 0x74624a, roughness: 1 });
-  const ridgeA = new THREE.MeshStandardMaterial({ color: 0x6f9757, roughness: 0.95 });
-  const ridgeB = new THREE.MeshStandardMaterial({ color: 0x81ab68, roughness: 0.95 });
+  const ridgeA = new THREE.MeshStandardMaterial({ color: 0x7d9a6e, roughness: 0.98 });
+  const ridgeB = new THREE.MeshStandardMaterial({ color: 0x88a878, roughness: 0.98 });
   const bermMat = new THREE.MeshStandardMaterial({ color: 0xc3b189, roughness: 1 });
   const roadMat = new THREE.MeshStandardMaterial({ color: 0xb7a583, roughness: 1 });
   const rutMat = new THREE.MeshStandardMaterial({ color: 0x9d8c6c, roughness: 1 });
@@ -4264,4 +4264,4 @@ window.addEventListener('pagehide', (event) => {
 })();
 
 window.TIANMINGBAI_READY = true;
-window.TM_VERSION = 'v48';
+window.TM_VERSION = 'v49';
