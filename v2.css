@@ -1405,11 +1405,12 @@ button:focus-visible, a:focus-visible {
   padding: 12px 0 0;
   border-top: 1px dashed var(--line);
 }
-.zone-detail > div {
+.zone-detail > div:first-child {
   display: grid;
   grid-template-columns: 31px 1fr;
   gap: 8px;
 }
+.zone-detail > div.zone-metrics { width: 100%; }
 .zone-detail-index {
   display: grid;
   place-items: center;
@@ -2488,9 +2489,9 @@ body.farm-open { overflow: hidden; }
 
 
 /* v38 选中信息卡与点位图标 */
-.zone-metrics { margin-top: 7px; display: grid; gap: 5px; }
+.zone-metrics { margin-top: 8px; width: 100%; display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
 .zone-metrics[hidden], .zone-clear[hidden] { display: none; }
-.metric-row { display: grid; grid-template-columns: 50px 1fr 56px; gap: 6px; align-items: center; font-size: 8.5px; color: var(--muted); }
+.metric-row { display: grid; grid-template-columns: 54px minmax(60px, 1fr) 74px; gap: 6px; align-items: center; font-size: 9px; color: var(--muted); white-space: nowrap; }
 .metric-row i { height: 6px; border-radius: 3px; background: #e7ddc6; overflow: hidden; }
 .metric-row b { display: block; height: 100%; border-radius: 3px; transition: width .3s ease; }
 .metric-row em { font-style: normal; text-align: right; font-size: 9px; }
@@ -2521,3 +2522,7 @@ body.farm-open { overflow: hidden; }
 .zone-card,.field-card,.panel{border-radius:var(--r-card)!important}
 button{transition:background .18s,border-color .18s,color .18s}
 button:not(.area-cut):not(.layer-switch button):not(.dock-send):not(.dock-chip){border-color:rgba(31,74,50,.16)!important;background-color:transparent}
+
+/* v43 场景与信息卡细节 */
+.pin-line { position:absolute; left:50%; top:100%; width:1px; height:12px; background:linear-gradient(rgba(47,142,124,.55), rgba(47,142,124,0)); transform:translateX(-.5px); }
+.zone-metrics .metric-row i { min-width:0; }
