@@ -95,8 +95,8 @@ const weathers = {
     temp: '14~22℃',
     wind: '3级',
     seal: '预报有雨',
-    sky: ['#c8ddd9', '#e6ead5', '#d5c5a4'],
-    fog: 0xd5dfd2,
+    sky: ['#cfe6f3', '#e9f2f6', '#e4ede1'],
+    fog: 0xdce8e2,
     sun: 2.7,
     hemi: 1.75,
     water: 0.62,
@@ -122,8 +122,8 @@ const weathers = {
     temp: '2~9℃',
     wind: '4级',
     seal: '降温',
-    sky: ['#b8cdd9', '#dfe5e2', '#d5cbb8'],
-    fog: 0xcbd7dc,
+    sky: ['#d3e4ef', '#edf3f6', '#e6eee5'],
+    fog: 0xd6e2e8,
     sun: 1.8,
     hemi: 1.55,
     water: 0.62,
@@ -149,8 +149,8 @@ const weathers = {
     temp: '12~16℃',
     wind: '3级',
     seal: '连雨',
-    sky: ['#aebfc7', '#d8e1df', '#c9c0ad'],
-    fog: 0xbecbd0,
+    sky: ['#b5c8d3', '#d7e0e4', '#cfd6d2'],
+    fog: 0xc4d0d6,
     sun: 1.5,
     hemi: 1.55,
     water: 0.9,
@@ -177,8 +177,8 @@ const weathers = {
     temp: '8~17℃',
     wind: '6级',
     seal: '大风',
-    sky: ['#dddccf', '#eee8d8', '#d8c8aa'],
-    fog: 0xd8d6c9,
+    sky: ['#dbe7ea', '#eef3f0', '#e2ded2'],
+    fog: 0xdde4e0,
     sun: 2.4,
     hemi: 1.9,
     water: 0.52,
@@ -204,8 +204,8 @@ const weathers = {
     temp: '20~31℃',
     wind: '2级',
     seal: '偏干',
-    sky: ['#e8dec7', '#f2ead7', '#d8c5a2'],
-    fog: 0xe4dcc7,
+    sky: ['#d9e6ec', '#eef3ee', '#e6dfcd'],
+    fog: 0xe4e8e0,
     sun: 3.25,
     hemi: 1.75,
     water: 0.2,
@@ -1455,11 +1455,18 @@ addFarmHouse(6.7, -9.1, 0.48);
 addFarmHouse(8.2, -9.7, 0.58);
 addFarmHouse(9.7, -10.5, 0.42);
 addFarmHouse(-1.0, -11.2, 0.46);
+// v46 远景村落：越过林带再放一圈更小的房，做出「田在村边」的纵深，只做空间锚点不抢主体。
+[
+  [-13.2, -20.2, 0.26], [-11.4, -21.0, 0.23], [-9.6, -20.4, 0.21],
+  [-4.4, -22.6, 0.24], [-2.6, -21.8, 0.2], [0.6, -23.0, 0.22],
+  [3.4, -21.4, 0.25], [5.2, -22.4, 0.21], [7.8, -20.8, 0.24],
+  [10.2, -22.0, 0.22], [12.4, -20.6, 0.2], [-7.0, -23.4, 0.19]
+].forEach(([x, z, s]) => addFarmHouse(x, z, s));
 
 const cloudMaterial = new THREE.MeshBasicMaterial({
   color: 0xfaf8ed,
   transparent: true,
-  opacity: 0.28,
+  opacity: 0.42,
   depthWrite: false
 });
 const clouds = new THREE.Group();
@@ -4183,4 +4190,4 @@ window.addEventListener('pagehide', (event) => {
 })();
 
 window.TIANMINGBAI_READY = true;
-window.TM_VERSION = 'v45';
+window.TM_VERSION = 'v46';
