@@ -877,7 +877,7 @@ const scene = new THREE.Scene();
 scene.fog = new THREE.FogExp2(0xdfe6da, 0.0052);
 
 const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 180);
-camera.position.set(3.4, 14.6, 17.2);
+camera.position.set(2.2, 17.6, 20.4);
 
 const renderer = new THREE.WebGLRenderer({
   antialias: true,
@@ -1490,11 +1490,11 @@ addFarmHouse(-1.0, -11.2, 0.46);
     world.add(bV2);
     let s = seed;
     const rnd = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
-    const rows = 9;
+    const rows = 16;
     for (let i = 0; i < rows; i++) {
-      const zz = cz - d / 2 + 0.5 + i * ((d - 1.0) / (rows - 1));
-      const ridge = new THREE.Mesh(new THREE.BoxGeometry(w - 0.55, 0.08, 0.44), i % 2 ? ridgeA : ridgeB);
-      ridge.position.set(cx, 0.075, zz);
+      const zz = cz - d / 2 + 0.35 + i * ((d - 0.7) / (rows - 1));
+      const ridge = new THREE.Mesh(new THREE.BoxGeometry(w - 1.05, 0.055, 0.22), i % 2 ? ridgeA : ridgeB);
+      ridge.position.set(cx, 0.055, zz);
       ridge.scale.y = 0.9 + rnd() * 0.45;
       world.add(ridge);
     }
@@ -1507,25 +1507,25 @@ addFarmHouse(-1.0, -11.2, 0.46);
 
   // 机耕道：两条纵向 + 两条横向，把主田与外围田连成路网
   [[-7.7, 27.5], [7.7, 27.5]].forEach(([x, len]) => {
-    const road = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.055, len), roadMat);
+    const road = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.05, len), roadMat);
     road.position.set(x, 0.03, 0);
     world.add(road);
     const rutA = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.02, len - 1), rutMat);
-    rutA.position.set(x - 0.42, 0.06, 0);
+    rutA.position.set(x - 0.3, 0.055, 0);
     world.add(rutA);
     const rutB = rutA.clone();
-    rutB.position.x = x + 0.42;
+    rutB.position.x = x + 0.3;
     world.add(rutB);
   });
   [[-13.6, 34.2], [12.9, 33]].forEach(([z, len]) => {
-    const road = new THREE.Mesh(new THREE.BoxGeometry(len, 0.055, 2.1), roadMat);
+    const road = new THREE.Mesh(new THREE.BoxGeometry(len, 0.05, 1.7), roadMat);
     road.position.set(0, 0.03, z);
     world.add(road);
     const rutA = new THREE.Mesh(new THREE.BoxGeometry(len - 1, 0.02, 0.26), rutMat);
-    rutA.position.set(0, 0.06, z - 0.4);
+    rutA.position.set(0, 0.055, z - 0.3);
     world.add(rutA);
     const rutB = rutA.clone();
-    rutB.position.z = z + 0.4;
+    rutB.position.z = z + 0.3;
     world.add(rutB);
   });
 
@@ -4264,4 +4264,4 @@ window.addEventListener('pagehide', (event) => {
 })();
 
 window.TIANMINGBAI_READY = true;
-window.TM_VERSION = 'v47';
+window.TM_VERSION = 'v48';
