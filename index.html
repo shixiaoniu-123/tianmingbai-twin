@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#183d2d">
   <title>田明白 · 我的农田数字孪生</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231c4d36'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-size='38' font-family='serif' fill='%23fbf8ef'%3E田%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./v2.css?v=43">
+  <link rel="stylesheet" href="./v2.css?v=44">
 </head>
 <body>
   <div class="page">
@@ -527,10 +527,7 @@
   var want=new URLSearchParams(location.search).get('cdn');
   var source=maps[want]?want:'local';
   window.__TM_IMPORT_SOURCE=source;
-  var tag=document.createElement('script');
-  tag.type='importmap';
-  tag.textContent=JSON.stringify({imports:maps[source]});
-  document.head.appendChild(tag);
+  document.write('<script type="importmap">'+JSON.stringify({imports:maps[source]})+'<\/script>');
 })();
   </script>
   <script>
@@ -540,12 +537,12 @@
     if(launched) return; launched=true;
     var sc=document.createElement('script');
     sc.type='module';
-    sc.src='./v2.js?v=43';
+    sc.src='./v2.js?v=44';
     sc.onerror=nextSource;
     document.body.appendChild(sc);
     setTimeout(function(){
       if(!window.TIANMINGBAI_READY) nextSource();
-    }, 9000);
+    }, 12000);
   }
   function nextSource(){
     if(window.TIANMINGBAI_READY) return;
