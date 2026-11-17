@@ -353,40 +353,40 @@ const regionProfiles = {
 
 let regions = [
   { id: 'north-weak', tag: 'weak', role: 'north-weak', index: '01', block: '西北田块',
-    name: '北侧弱苗区', short: '北侧弱苗', x: -8.3, z: -6.2, w: 2.7, d: 2.9,
+    name: '北侧弱苗区', short: '北侧弱苗', x: -8.3, z: -6.2, w: 3.0, d: 3.2,
     note: '苗情偏弱，降温与大风天气优先查看。', vigor: '偏弱', moisture: '正常' },
   { id: 'north-mid', tag: 'general', role: 'general', index: '02', block: '西北田块',
-    name: '北侧中区', short: '北中区', x: -5.3, z: -6.2, w: 2.7, d: 2.9,
+    name: '北侧中区', short: '北中区', x: -5.3, z: -6.2, w: 3.0, d: 3.2,
     note: '苗情均匀，常规管理即可。', vigor: '正常', moisture: '正常' },
   { id: 'north-east-2', tag: 'general', role: 'general', index: '03', block: '西北田块',
-    name: '北侧东区', short: '北东区', x: -2.3, z: -6.2, w: 2.7, d: 2.9,
+    name: '北侧东区', short: '北东区', x: -2.3, z: -6.2, w: 3.0, d: 3.2,
     note: '近机耕道，注意地头压实与出苗。', vigor: '正常', moisture: '正常' },
   { id: 'north-east', tag: 'control', role: 'north-east', index: '04', block: '东北田块',
-    name: '东北正常区', short: '东北区', x: 2.3, z: -6.2, w: 2.7, d: 2.9,
+    name: '东北正常区', short: '东北区', x: 2.2, z: -6.2, w: 3.0, d: 3.2,
     note: '当前苗情较均匀，可作全田对照区。', vigor: '正常', moisture: '正常' },
   { id: 'north-east-mid', tag: 'general', role: 'general', index: '05', block: '东北田块',
-    name: '东北中区', short: '东中区', x: 5.3, z: -6.2, w: 2.7, d: 2.9,
+    name: '东北中区', short: '东中区', x: 5.3, z: -6.2, w: 3.0, d: 3.2,
     note: '常规管理区，关注苗情均匀度。', vigor: '正常', moisture: '正常' },
   { id: 'east-low', tag: 'low', role: 'east-low', index: '06', block: '东北田块',
-    name: '东侧低洼区', short: '东侧洼地', x: 8.3, z: -6.2, w: 2.7, d: 2.9,
+    name: '东侧低洼区', short: '东侧洼地', x: 8.3, z: -6.2, w: 3.0, d: 3.2,
     note: '地势偏低，降雨时优先检查排水。', vigor: '正常', moisture: '偏湿' },
   { id: 'west-normal', tag: 'general', role: 'west-normal', index: '07', block: '西南田块',
-    name: '西侧正常区', short: '西侧区', x: -8.3, z: 6.2, w: 2.7, d: 2.9,
+    name: '西侧正常区', short: '西侧区', x: -8.3, z: 6.2, w: 3.0, d: 3.2,
     note: '苗情平稳，按常规节奏管理。', vigor: '正常', moisture: '正常' },
   { id: 'south-west', tag: 'general', role: 'general', index: '08', block: '西南田块',
-    name: '南侧西区', short: '南西区', x: -5.3, z: 6.2, w: 2.7, d: 2.9,
+    name: '南侧西区', short: '南西区', x: -5.3, z: 6.2, w: 3.0, d: 3.2,
     note: '常规管理区，播后长势正常。', vigor: '正常', moisture: '正常' },
   { id: 'center-normal', tag: 'dry', role: 'center-normal', index: '09', block: '西南田块',
-    name: '中部正常区', short: '中部正常区', x: -2.3, z: 6.2, w: 2.7, d: 2.9,
+    name: '中部正常区', short: '中部正常区', x: -2.2, z: 6.2, w: 3.0, d: 3.2,
     note: '地势略高，连续晴天墒情易偏干。', vigor: '正常', moisture: '偏干' },
   { id: 'south-field', tag: 'canal', role: 'south-field', index: '10', block: '东南田块',
-    name: '南侧近渠区', short: '南侧近渠', x: 2.3, z: 6.2, w: 2.7, d: 2.9,
+    name: '南侧近渠区', short: '南侧近渠', x: 2.2, z: 6.2, w: 3.0, d: 3.2,
     note: '靠近灌渠与机耕道，关注倒灌和作业安全。', vigor: '正常', moisture: '正常' },
   { id: 'south-mid', tag: 'general', role: 'general', index: '11', block: '东南田块',
-    name: '南侧中区', short: '南中区', x: 5.3, z: 6.2, w: 2.7, d: 2.9,
+    name: '南侧中区', short: '南中区', x: 5.3, z: 6.2, w: 3.0, d: 3.2,
     note: '常规管理区，注意渠边杂草。', vigor: '正常', moisture: '正常' },
   { id: 'south-east', tag: 'weak', role: 'general', index: '12', block: '东南田块',
-    name: '南侧东区', short: '南东区', x: 8.3, z: 6.2, w: 2.7, d: 2.9,
+    name: '南侧东区', short: '南东区', x: 8.3, z: 6.2, w: 3.0, d: 3.2,
     note: '苗情偏弱，建议单独补肥复核。', vigor: '偏弱', moisture: '正常' }
 ];
 
@@ -1559,20 +1559,20 @@ addFarmHouse(-1.0, -11.2, 0.46);
   });
   // v53 片区内部十字机耕道：把 4 个田块串起来，形成真实路网
   (function innerRoads(){
-    const roadV = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.05, 21.5), roadMat);
+    const roadV = new THREE.Mesh(new THREE.BoxGeometry(1.15, 0.05, 21.5), roadMat);
     roadV.position.set(0, 0.032, 0);
     world.add(roadV);
-    const rutVa = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.02, 20.6), rutMat);
-    rutVa.position.set(-0.38, 0.056, 0);
+    const rutVa = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.02, 20.6), rutMat);
+    rutVa.position.set(-0.26, 0.056, 0);
     world.add(rutVa);
-    const rutVb = rutVa.clone(); rutVb.position.x = 0.38; world.add(rutVb);
-    const roadH = new THREE.Mesh(new THREE.BoxGeometry(24.4, 0.05, 1.8), roadMat);
+    const rutVb = rutVa.clone(); rutVb.position.x = 0.26; world.add(rutVb);
+    const roadH = new THREE.Mesh(new THREE.BoxGeometry(24.4, 0.05, 1.15), roadMat);
     roadH.position.set(0, 0.034, 0);
     world.add(roadH);
-    const rutHa = new THREE.Mesh(new THREE.BoxGeometry(23.5, 0.02, 0.3), rutMat);
-    rutHa.position.set(0, 0.058, -0.38);
+    const rutHa = new THREE.Mesh(new THREE.BoxGeometry(23.5, 0.02, 0.22), rutMat);
+    rutHa.position.set(0, 0.058, -0.26);
     world.add(rutHa);
-    const rutHb = rutHa.clone(); rutHb.position.z = 0.38; world.add(rutHb);
+    const rutHb = rutHa.clone(); rutHb.position.z = 0.26; world.add(rutHb);
   })();
 
   [[-13.6, 34.2], [12.9, 33]].forEach(([z, len]) => {
@@ -2814,7 +2814,7 @@ function renderZoneState() {
     zoneDetailIndex.textContent = selected.index;
     zoneDetailTitle.textContent = selected.name;
     zoneDetailText.textContent = regionHint(selected);
-    zoneDetailTag.textContent = `${layerNameMap[state.layer]}层 · ${layerStatusLabel(selected)}`;
+    zoneDetailTag.textContent = `${selected.block} · ${layerNameMap[state.layer]}层 · ${layerStatusLabel(selected)}`;
     if (metricsRoot) metricsRoot.hidden = false;
     const mBar = document.getElementById('zoneMoistureBar');
     const mVal = document.getElementById('zoneMoistureVal');
