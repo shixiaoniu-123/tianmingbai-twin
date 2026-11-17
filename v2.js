@@ -874,7 +874,44 @@ if (!webglAvailable) {
 }
 
 const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0xdfe6da, 0.0052);
+scene.fog = new THREE.FogExp2(0xdbe6de, 0.0034);
+
+// UE 风格渐变天空穹顶（顶部天蓝 → 地平线雾白），替代原先透明的纯色底
+(function addSkyDome() {
+  const skyMat = new THREE.ShaderMaterial({
+    uniforms: {
+      topColor: { value: new THREE.Color(0x8fb4d8) },
+      midColor: { value: new THREE.Color(0xcfe0e6) },
+      botColor: { value: new THREE.Color(0xeef0e2) }
+    },
+    vertexShader: `
+      varying vec3 vPos;
+      void main() {
+        vPos = normalize(position);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform vec3 topColor; uniform vec3 midColor; uniform vec3 botColor;
+      varying vec3 vPos;
+      void main() {
+        float h = clamp(vPos.y, -1.0, 1.0);
+        vec3 col = h > 0.0
+          ? mix(midColor, topColor, pow(h, 0.75))
+          : mix(midColor, botColor, clamp(-h * 3.0, 0.0, 1.0));
+        gl_FragColor = vec4(col, 1.0);
+      }
+    `,
+    side: THREE.BackSide,
+    depthWrite: false,
+    fog: false
+  });
+  const sky = new THREE.Mesh(new THREE.SphereGeometry(150, 32, 20), skyMat);
+  sky.position.y = 0;
+  sky.renderOrder = -1;
+  sky.frustumCulled = false;
+  scene.add(sky);
+})();
 
 const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 180);
 camera.position.set(1.6, 21.5, 19.0);
@@ -1353,6 +1390,35 @@ for (let i = 0; i <= 8; i++) {
   world.add(post);
 }
 
+const contactTex = (function makeContactTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createRadialGradient(32, 32, 2, 32, 32, 31);
+  grad.addColorStop(0, 'rgba(0,0,0,0.5)');
+  grad.addColorStop(0.55, 'rgba(0,0,0,0.22)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 64, 64);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+})();
+const contactMat = new THREE.MeshBasicMaterial({
+  map: contactTex,
+  transparent: true,
+  depthWrite: false,
+  opacity: 0.5
+});
+function addContactShadow(group, rx, rz, opacity = 1) {
+  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(rx, rz), contactMat);
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.position.y = 0.021;
+  shadow.renderOrder = 1;
+  group.add(shadow);
+  return shadow;
+}
+
 function addTree(x, z, scale = 1, variation = 0) {
   const group = new THREE.Group();
   const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.1, 0.72, 6), shared.trunk);
@@ -1378,6 +1444,14 @@ function addTree(x, z, scale = 1, variation = 0) {
     crown.scale.y = 0.82;
     group.add(crown);
   });
+  const underCrown = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(0.46, 1),
+    new THREE.MeshStandardMaterial({ color: 0x2f4d3a, roughness: 1, flatShading: true })
+  );
+  underCrown.position.set(0.02, 0.86, 0.04);
+  underCrown.scale.y = 0.7;
+  group.add(underCrown);
+  addContactShadow(group, 1.05, 1.05);
   group.scale.setScalar(scale);
   group.position.set(x, 0, z);
   world.add(group);
@@ -1430,13 +1504,31 @@ function addFarmHouse(x, z, scale = 1) {
   wall.position.y = 0.36;
   group.add(wall);
 
-  const roof = new THREE.Mesh(
-    new THREE.BoxGeometry(1.46, 0.16, 1.02),
-    new THREE.MeshStandardMaterial({ color: 0x994a36, roughness: 0.92 })
+  const roofMat = new THREE.MeshStandardMaterial({ color: 0x8f4a37, roughness: 0.9, flatShading: true });
+  const slopeA = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.05, 0.56), roofMat);
+  slopeA.position.set(0, 0.86, -0.25);
+  slopeA.rotation.x = 0.42;
+  group.add(slopeA);
+  const slopeB = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.05, 0.56), roofMat);
+  slopeB.position.set(0, 0.86, 0.25);
+  slopeB.rotation.x = -0.42;
+  group.add(slopeB);
+  const ridge = new THREE.Mesh(new THREE.BoxGeometry(1.52, 0.05, 0.06), roofMat);
+  ridge.position.set(0, 0.985, 0);
+  group.add(ridge);
+  const chimney = new THREE.Mesh(
+    new THREE.BoxGeometry(0.13, 0.28, 0.13),
+    new THREE.MeshStandardMaterial({ color: 0x8a7a63, roughness: 1 })
   );
-  roof.position.set(0, 0.83, 0);
-  roof.rotation.z = 0.04;
-  group.add(roof);
+  chimney.position.set(0.4, 1.02, -0.12);
+  group.add(chimney);
+  const winMat = new THREE.MeshStandardMaterial({ color: 0x47586a, roughness: 0.5, metalness: 0.15 });
+  [-0.32, 0.32].forEach((wx) => {
+    const win = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.19, 0.02), winMat);
+    win.position.set(wx, 0.45, 0.437);
+    group.add(win);
+  });
+  addContactShadow(group, 2.0, 1.5);
 
   const door = new THREE.Mesh(
     new THREE.BoxGeometry(0.21, 0.37, 0.025),
@@ -4297,7 +4389,7 @@ window.addEventListener('pagehide', (event) => {
 })();
 
 window.TIANMINGBAI_READY = true;
-window.TM_VERSION = 'v51';
+window.TM_VERSION = 'v52';
 (function injectHoverCss() {
   if (document.getElementById('tmHoverCss')) return;
   const style = document.createElement('style');
