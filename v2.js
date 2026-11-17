@@ -1785,7 +1785,7 @@ function makeRegionMesh(def, index) {
     new THREE.MeshBasicMaterial({
       color: 0xf5ede0,
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.92,
       side: THREE.DoubleSide,
       depthWrite: false
     })
@@ -2662,6 +2662,7 @@ function renderLayer() {
       ? (severity === 'risk' ? 0.35 : severity === 'watch' ? 0.29 : 0.24)
       : 0.28;
     region.edgeMaterial.color.setHex(layerColor(region.id));
+    if (state.selected === region.id) region.overlayMaterial.opacity = Math.max(region.overlayMaterial.opacity, 0.42);
     region.edgeMaterial.opacity = state.selected === region.id ? 0.95 : severity === 'normal' ? 0.24 : 0.6;
     region.selectedCorner.visible = state.selected === region.id;
     region.selectedCorner.material.color.setHex(layerColor(region.id));
@@ -4296,7 +4297,7 @@ window.addEventListener('pagehide', (event) => {
 })();
 
 window.TIANMINGBAI_READY = true;
-window.TM_VERSION = 'v50';
+window.TM_VERSION = 'v51';
 (function injectHoverCss() {
   if (document.getElementById('tmHoverCss')) return;
   const style = document.createElement('style');
