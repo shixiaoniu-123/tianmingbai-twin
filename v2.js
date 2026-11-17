@@ -4032,15 +4032,15 @@ window.addEventListener('pagehide', (event) => {
     const card = document.createElement('div');
     const level = payload.priority === '高' ? 'p-high' : payload.priority === '低' ? 'p-low' : 'p-mid';
     card.className = `ask-card ${level}${payload.refuse ? ' refuse' : ''}`;
-    card.style.cssText = 'background:rgba(255,255,255,.045);border-radius:13px;padding:13px 15px';
+    card.style.cssText = 'background:#fffdf7;border:1px solid rgba(31,74,50,.1);border-radius:13px;padding:13px 15px;box-shadow:0 6px 18px rgba(24,42,30,.08)';
 
     const line1 = document.createElement('div');
     line1.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px';
     const verdict = document.createElement('span');
-    verdict.style.cssText = 'color:#f7f3e6;font-size:16.5px;font-weight:700;letter-spacing:.3px';
+    verdict.style.cssText = 'color:#1e3b2b;font-size:16.5px;font-weight:700;letter-spacing:.3px';
     verdict.textContent = payload.verdict || '先到地里核对一遍';
     const pill = document.createElement('span');
-    pill.style.cssText = 'font-size:11px;padding:2px 8px;border-radius:999px;background:rgba(217,131,36,.16);color:#e2a86a;border:1px solid rgba(217,131,36,.34)';
+    pill.style.cssText = 'font-size:11px;padding:2px 8px;border-radius:999px;background:rgba(217,131,36,.14);color:#8a5a12;border:1px solid rgba(217,131,36,.32)';
     pill.textContent = `优先级${payload.priority || '中'}`;
     line1.appendChild(verdict);
     line1.appendChild(pill);
@@ -4048,10 +4048,10 @@ window.addEventListener('pagehide', (event) => {
 
     if (payload.reason) {
       const reason = document.createElement('div');
-      reason.style.cssText = 'color:rgba(243,239,225,.86);font-size:13px;line-height:1.72;margin-top:3px';
+      reason.style.cssText = 'color:#42544a;font-size:13px;line-height:1.72;margin-top:3px';
       const tag = document.createElement('span');
       tag.textContent = '依据：';
-      tag.style.color = 'rgba(198,166,98,.9)';
+      tag.style.color = '#8a6320';
       reason.appendChild(tag);
       reason.appendChild(document.createTextNode(payload.reason));
       card.appendChild(reason);
@@ -4060,11 +4060,11 @@ window.addEventListener('pagehide', (event) => {
     const actions = Array.isArray(payload.actions) ? payload.actions.filter(Boolean) : [];
     if (actions.length) {
       const label = document.createElement('div');
-      label.style.cssText = 'color:rgba(198,166,98,.9);font-size:12px;margin-top:9px';
+      label.style.cssText = 'color:#8a6320;font-size:12px;margin-top:9px';
       label.textContent = payload.refuse ? '去核实：' : '今天先做：';
       card.appendChild(label);
       const list = document.createElement('ol');
-      list.style.cssText = 'margin:5px 0 0;padding-left:19px;color:rgba(243,239,225,.9);font-size:13px;line-height:1.85';
+      list.style.cssText = 'margin:5px 0 0;padding-left:19px;color:#33453b;font-size:13px;line-height:1.85';
       actions.forEach((a) => {
         const li = document.createElement('li');
         li.textContent = a;
@@ -4075,10 +4075,10 @@ window.addEventListener('pagehide', (event) => {
 
     if (payload.window) {
       const win = document.createElement('div');
-      win.style.cssText = 'color:rgba(243,239,225,.82);font-size:12.5px;margin-top:7px';
+      win.style.cssText = 'color:#5b6b60;font-size:12.5px;margin-top:7px';
       const tag = document.createElement('span');
       tag.textContent = '时间窗：';
-      tag.style.color = 'rgba(198,166,98,.9)';
+      tag.style.color = '#8a6320';
       win.appendChild(tag);
       win.appendChild(document.createTextNode(payload.window));
       card.appendChild(win);
@@ -4086,17 +4086,17 @@ window.addEventListener('pagehide', (event) => {
 
     if (payload.refuse && payload.refuse_reason) {
       const why = document.createElement('div');
-      why.style.cssText = 'color:rgba(243,239,225,.82);font-size:12.5px;line-height:1.7;margin-top:7px';
+      why.style.cssText = 'color:#5b6b60;font-size:12.5px;line-height:1.7;margin-top:7px';
       const tag = document.createElement('span');
       tag.textContent = '为什么不能替你定：';
-      tag.style.color = 'rgba(224,154,139,.95)';
+      tag.style.color = '#a8493a';
       why.appendChild(tag);
       why.appendChild(document.createTextNode(payload.refuse_reason));
       card.appendChild(why);
     }
 
     const meta = document.createElement('div');
-    meta.style.cssText = 'color:rgba(243,239,225,.42);font-size:11.5px;margin-top:9px;letter-spacing:.2px';
+    meta.style.cssText = 'color:rgba(45,66,54,.55);font-size:11.5px;margin-top:9px;letter-spacing:.2px';
     meta.textContent = `置信度${payload.confidence || '中'}　·　依据当前地块实时生成${payload.cached ? '（同问缓存）' : ''}`;
     card.appendChild(meta);
 
@@ -4183,4 +4183,4 @@ window.addEventListener('pagehide', (event) => {
 })();
 
 window.TIANMINGBAI_READY = true;
-window.TM_VERSION = 'v43';
+window.TM_VERSION = 'v45';
