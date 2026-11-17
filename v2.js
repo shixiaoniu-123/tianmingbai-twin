@@ -876,8 +876,8 @@ if (!webglAvailable) {
 const scene = new THREE.Scene();
 scene.fog = new THREE.FogExp2(0xdfe6da, 0.0095);
 
-const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
-camera.position.set(7.4, 13.2, 9.4);
+const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+camera.position.set(5.6, 9.6, 7.2);
 
 const renderer = new THREE.WebGLRenderer({
   antialias: true,
@@ -904,7 +904,7 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.07;
 controls.enablePan = false;
 controls.minDistance = 2.2;
-controls.maxDistance = 24;
+controls.maxDistance = 21;
 controls.minPolarAngle = 0.12;
 controls.maxPolarAngle = 1.38;
 controls.target.set(0, 0.15, 0.3);
@@ -1391,6 +1391,34 @@ function addTree(x, z, scale = 1, variation = 0) {
   [-13.4, -1.4, 0.66, 1], [13.3, -1.0, 0.68, 3], [-0.2, -11.6, 0.6, 2]
 ].forEach((args) => addTree(...args));
 
+// v43 远景：低矮树线 + 缓坡土丘，压住外围空白
+(function addFarBand(){
+  const farA = new THREE.MeshStandardMaterial({ color: 0x5b7a5e, roughness: 1, flatShading: true });
+  const farB = new THREE.MeshStandardMaterial({ color: 0x6f8c68, roughness: 1, flatShading: true });
+  for (let i = 0; i < 52; i++) {
+    const t = i / 51;
+    const x = -18 + t * 36 + Math.sin(i * 2.3) * 0.7;
+    const z = -14.2 - Math.abs(Math.sin(i * 1.7)) * 1.3;
+    const h = 0.75 + ((i * 37) % 9) * 0.08;
+    const crown = new THREE.Mesh(new THREE.ConeGeometry(0.42 + (i % 3) * 0.1, h, 6), i % 2 ? farA : farB);
+    crown.position.set(x, h * 0.62, z);
+    crown.rotation.y = i * 0.35;
+    world.add(crown);
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.06, 0.5, 5), shared.trunk);
+    stem.position.set(x, 0.25, z);
+    world.add(stem);
+  }
+  const moundMat = new THREE.MeshStandardMaterial({ color: 0x9aa987, roughness: 1, flatShading: true });
+  const moundMats = [0x9aa987, 0xa7b490, 0x8f9d7e];
+  for (let i = 0; i < 5; i++) {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(3.1 + i * 0.5, 7, 4, 0, Math.PI * 2, 0, Math.PI / 2),
+      new THREE.MeshStandardMaterial({ color: moundMats[i % 3], roughness: 1, flatShading: true }));
+    m.position.set(-13 + i * 6.6, -0.3, -17.6 - (i % 2) * 1.6);
+    m.scale.set(1, 0.34, 0.8);
+    world.add(m);
+  }
+})();
+
 function addFarmHouse(x, z, scale = 1) {
   const group = new THREE.Group();
   const wall = new THREE.Mesh(
@@ -1462,8 +1490,8 @@ function createTuftGeometry() {
   const positions = [];
   const indices = [];
   const random = seeded(4711);
-  const bladeCount = 9;
-  const segments = 4;
+  const bladeCount = 12;
+  const segments = 5;
 
   for (let blade = 0; blade < bladeCount; blade++) {
     const angle = (blade / bladeCount) * Math.PI * 2 + (random() - 0.5) * 0.5;
@@ -1471,11 +1499,11 @@ function createTuftGeometry() {
     const dz = Math.sin(angle);
     const px = -dz;
     const pz = dx;
-    const radius = 0.008 + random() * 0.024;
-    const height = 0.5 + random() * 0.24;
-    const bend = 0.035 + random() * 0.05;
-    const tipDroop = 0.16 + random() * 0.12;
-    const baseWidth = 0.013 + random() * 0.005;
+    const radius = 0.005 + random() * 0.018;
+    const height = 0.44 + random() * 0.26;
+    const bend = 0.03 + random() * 0.045;
+    const tipDroop = 0.2 + random() * 0.14;
+    const baseWidth = 0.0074 + random() * 0.0034;
     const startIndex = positions.length / 3;
 
     for (let segment = 0; segment <= segments; segment++) {
@@ -4155,3 +4183,4 @@ window.addEventListener('pagehide', (event) => {
 })();
 
 window.TIANMINGBAI_READY = true;
+window.TM_VERSION = 'v43';
