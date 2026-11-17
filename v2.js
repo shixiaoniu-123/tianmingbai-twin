@@ -902,7 +902,9 @@ renderer.domElement.addEventListener('webglcontextlost', (event) => {
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.07;
-controls.enablePan = false;
+controls.enablePan = true;
+controls.panSpeed = 0.75;
+controls.screenSpacePanning = false;
 controls.minDistance = 2.2;
 controls.maxDistance = 46;
 controls.minPolarAngle = 0.12;
@@ -3210,6 +3212,25 @@ const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 let pointerDown = null;
 let hoverFrame = null;
+let hoverPinId = null;
+function setHoverPin(id) {
+  if (hoverPinId === id) return;
+  const prev = hoverPinId ? pinElements.get(hoverPinId) : null;
+  if (prev) {
+    prev.classList.remove('hovering');
+    const label = prev.querySelector('.pin-label');
+    if (label && prev.dataset.baseLabel) label.textContent = prev.dataset.baseLabel;
+  }
+  hoverPinId = id;
+  const next = id ? pinElements.get(id) : null;
+  if (next) {
+    const label = next.querySelector('.pin-label');
+    if (label && !next.dataset.baseLabel) next.dataset.baseLabel = label.textContent;
+    const def = regions.find((region) => region.id === id);
+    if (label && def) label.textContent = `${def.short} · ${layerStatusLabel(def)}`;
+    next.classList.add('hovering');
+  }
+}
 
 function setPointer(event) {
   const rect = renderer.domElement.getBoundingClientRect();
@@ -3228,7 +3249,7 @@ function regionAtPointer(event) {
 }
 
 renderer.domElement.addEventListener('pointerdown', (event) => {
-  pointerDown = { x: event.clientX, y: event.clientY, id: event.pointerId };
+  pointerDown = { x: event.clientX, y: event.clientY, id: event.pointerId, button: event.button };
   if (renderer.domElement.setPointerCapture) renderer.domElement.setPointerCapture(event.pointerId);
 });
 
@@ -3240,8 +3261,9 @@ renderer.domElement.addEventListener('pointerup', (event) => {
   if (!pointerDown) return;
   const moved = Math.hypot(event.clientX - pointerDown.x, event.clientY - pointerDown.y);
   const samePointer = pointerDown.id === event.pointerId;
+  const mainButton = pointerDown.button === 0;
   pointerDown = null;
-  if (samePointer && moved < 7) {
+  if (samePointer && moved < 7 && mainButton) {
     const region = regionAtPointer(event);
     if (region) selectRegion(region.id);
     else clearSelection();
@@ -3255,6 +3277,7 @@ renderer.domElement.addEventListener('pointermove', (event) => {
     const region = regionAtPointer(event);
     renderer.domElement.style.cursor = region ? 'pointer' : 'grab';
     renderer.domElement.title = region ? `${region.def.name} · ${layerStatusLabel(region.def)}` : '';
+    setHoverPin(region ? region.id : null);
   });
 });
 
@@ -3366,6 +3389,15 @@ function animate(now) {
   lastFrame = now;
   tweenCamera(now);
   controls.update();
+  // 相机平移边界：目标点限制在片区内，且不穿地
+  const camTarget = controls.target;
+  if (camTarget.x > 13) camTarget.x = 13;
+  if (camTarget.x < -13) camTarget.x = -13;
+  if (camTarget.z > 11.5) camTarget.z = 11.5;
+  if (camTarget.z < -11.5) camTarget.z = -11.5;
+  if (camTarget.y > 0.9) camTarget.y = 0.9;
+  if (camTarget.y < 0.08) camTarget.y = 0.08;
+  if (camera.position.y < 1.1) camera.position.y = 1.1;
 
   const t = (now - clockStart) / 1000;
   if (!reducedMotion) {
@@ -4264,4 +4296,15 @@ window.addEventListener('pagehide', (event) => {
 })();
 
 window.TIANMINGBAI_READY = true;
-window.TM_VERSION = 'v49';
+window.TM_VERSION = 'v50';
+(function injectHoverCss() {
+  if (document.getElementById('tmHoverCss')) return;
+  const style = document.createElement('style');
+  style.id = 'tmHoverCss';
+  style.textContent = [
+    '.field-pin.hovering{transform:translate(-50%,-100%) scale(1.2);z-index:9;}',
+    '.field-pin.hovering .pin-label{display:block;}',
+    '.scene-host canvas{touch-action:none;}'
+  ].join('');
+  document.head.appendChild(style);
+})();
