@@ -4153,3 +4153,5 @@ window.addEventListener('pagehide', (event) => {
 
   if (typeof window !== 'undefined') window.__askDockReady = true;
 })();
+
+window.TIANMINGBAI_READY = true;
