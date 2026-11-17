@@ -2514,3 +2514,10 @@ body.farm-open { overflow: hidden; }
 .field-pin:hover { transform: translate(-50%, -100%) scale(1.12); }
 .field-pin[data-alert="1"] .pin-icon { animation: pinFlash 2s ease-in-out infinite; }
 @keyframes pinFlash { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+
+/* v41 统一留白与按钮层级 */
+:root{--r-card:16px}
+.zone-card,.field-card,.panel{border-radius:var(--r-card)!important}
+button{transition:background .18s,border-color .18s,color .18s}
+button:not(.area-cut):not(.layer-switch button):not(.dock-send):not(.dock-chip){border-color:rgba(31,74,50,.16)!important;background-color:transparent}
