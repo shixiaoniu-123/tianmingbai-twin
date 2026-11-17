@@ -874,10 +874,10 @@ if (!webglAvailable) {
 }
 
 const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0xdfe6da, 0.0095);
+scene.fog = new THREE.FogExp2(0xdfe6da, 0.0052);
 
-const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
-camera.position.set(5.6, 9.6, 7.2);
+const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 180);
+camera.position.set(3.4, 14.6, 17.2);
 
 const renderer = new THREE.WebGLRenderer({
   antialias: true,
@@ -904,7 +904,7 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.07;
 controls.enablePan = false;
 controls.minDistance = 2.2;
-controls.maxDistance = 21;
+controls.maxDistance = 46;
 controls.minPolarAngle = 0.12;
 controls.maxPolarAngle = 1.38;
 controls.target.set(0, 0.15, 0.3);
@@ -1462,6 +1462,80 @@ addFarmHouse(-1.0, -11.2, 0.46);
   [3.4, -21.4, 0.25], [5.2, -22.4, 0.21], [7.8, -20.8, 0.24],
   [10.2, -22.0, 0.22], [12.4, -20.6, 0.2], [-7.0, -23.4, 0.19]
 ].forEach(([x, z, s]) => addFarmHouse(x, z, s));
+
+// v47 片区尺度：主田之外再铺 4 块外围田 + 机耕道 + 路边树，让画面从"一小块田"变成"一片农田"
+(function addOuterDistrict(){
+  const soilMat = new THREE.MeshStandardMaterial({ color: 0x74624a, roughness: 1 });
+  const ridgeA = new THREE.MeshStandardMaterial({ color: 0x6f9757, roughness: 0.95 });
+  const ridgeB = new THREE.MeshStandardMaterial({ color: 0x81ab68, roughness: 0.95 });
+  const bermMat = new THREE.MeshStandardMaterial({ color: 0xc3b189, roughness: 1 });
+  const roadMat = new THREE.MeshStandardMaterial({ color: 0xb7a583, roughness: 1 });
+  const rutMat = new THREE.MeshStandardMaterial({ color: 0x9d8c6c, roughness: 1 });
+
+  function outerField(cx, cz, w, d, seed) {
+    const slab = new THREE.Mesh(new THREE.BoxGeometry(w, 0.1, d), soilMat);
+    slab.position.set(cx, 0.02, cz);
+    world.add(slab);
+    const bH = new THREE.Mesh(new THREE.BoxGeometry(w + 0.5, 0.11, 0.3), bermMat);
+    bH.position.set(cx, 0.05, cz - d / 2 - 0.15);
+    world.add(bH);
+    const bH2 = bH.clone();
+    bH2.position.z = cz + d / 2 + 0.15;
+    world.add(bH2);
+    const bV = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.11, d + 0.5), bermMat);
+    bV.position.set(cx - w / 2 - 0.15, 0.05, cz);
+    world.add(bV);
+    const bV2 = bV.clone();
+    bV2.position.x = cx + w / 2 + 0.15;
+    world.add(bV2);
+    let s = seed;
+    const rnd = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+    const rows = 9;
+    for (let i = 0; i < rows; i++) {
+      const zz = cz - d / 2 + 0.5 + i * ((d - 1.0) / (rows - 1));
+      const ridge = new THREE.Mesh(new THREE.BoxGeometry(w - 0.55, 0.08, 0.44), i % 2 ? ridgeA : ridgeB);
+      ridge.position.set(cx, 0.075, zz);
+      ridge.scale.y = 0.9 + rnd() * 0.45;
+      world.add(ridge);
+    }
+  }
+
+  outerField(-13.4, -8.9, 10.6, 7.4, 7);
+  outerField(13.4, -8.9, 10.6, 7.4, 13);
+  outerField(-13.4, 7.2, 10.6, 6.6, 21);
+  outerField(13.4, 7.2, 10.6, 6.6, 29);
+
+  // 机耕道：两条纵向 + 两条横向，把主田与外围田连成路网
+  [[-7.7, 27.5], [7.7, 27.5]].forEach(([x, len]) => {
+    const road = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.055, len), roadMat);
+    road.position.set(x, 0.03, 0);
+    world.add(road);
+    const rutA = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.02, len - 1), rutMat);
+    rutA.position.set(x - 0.42, 0.06, 0);
+    world.add(rutA);
+    const rutB = rutA.clone();
+    rutB.position.x = x + 0.42;
+    world.add(rutB);
+  });
+  [[-13.6, 34.2], [12.9, 33]].forEach(([z, len]) => {
+    const road = new THREE.Mesh(new THREE.BoxGeometry(len, 0.055, 2.1), roadMat);
+    road.position.set(0, 0.03, z);
+    world.add(road);
+    const rutA = new THREE.Mesh(new THREE.BoxGeometry(len - 1, 0.02, 0.26), rutMat);
+    rutA.position.set(0, 0.06, z - 0.4);
+    world.add(rutA);
+    const rutB = rutA.clone();
+    rutB.position.z = z + 0.4;
+    world.add(rutB);
+  });
+
+  // 路边成排树，压低外围空白
+  [
+    [-8.9, -13.6, 0.72, 0], [-8.9, -10.6, 0.64, 1], [-8.9, -3.0, 0.7, 2], [-8.9, 1.6, 0.66, 3],
+    [8.9, -13.2, 0.7, 1], [8.9, -10.0, 0.62, 0], [8.9, -2.4, 0.72, 3], [8.9, 2.2, 0.66, 2],
+    [-16.6, -3.4, 0.68, 2], [-16.2, 2.6, 0.62, 1], [16.4, -3.0, 0.7, 0], [16.6, 2.8, 0.64, 3]
+  ].forEach((args) => addTree(...args));
+})();
 
 const cloudMaterial = new THREE.MeshBasicMaterial({
   color: 0xfaf8ed,
@@ -4190,4 +4264,4 @@ window.addEventListener('pagehide', (event) => {
 })();
 
 window.TIANMINGBAI_READY = true;
-window.TM_VERSION = 'v46';
+window.TM_VERSION = 'v47';
